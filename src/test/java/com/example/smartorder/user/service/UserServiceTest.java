@@ -1,10 +1,13 @@
 package com.example.smartorder.user.service;
 
+import com.example.smartorder.user.UserMock;
+import com.example.smartorder.user.domain.Account;
 import com.example.smartorder.user.domain.AgeGroup;
 import com.example.smartorder.user.domain.Gender;
 import com.example.smartorder.user.domain.User;
 import com.example.smartorder.user.repository.UserRepository;
 import com.example.smartorder.user.service.dto.JoinUserCommand;
+import com.example.smartorder.user.service.dto.LoginUserCommand;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,9 +30,6 @@ class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    // join
-    // 존재하는 사용자면 에러
-    // 존재하지 않는 사용자면 넘어감 - id 리턴
     @Test
     public void joinWithExistingUserWillFail() {
         // Given
@@ -52,7 +52,7 @@ class UserServiceTest {
         }
 
         // Then
-        fail("Test has failed");
+        fail();
     }
 
     @Test
@@ -76,17 +76,42 @@ class UserServiceTest {
         assertThat(userId).isNotEqualTo(null);
     }
 
-    // login
-    // 존재하지 않는 사용자면 에러
-    // 존재하는 사용자면 id 리턴
     @Test
     public void loginWithUnknownUserWillFail() {
+        // Given
+        LoginUserCommand user = LoginUserCommand.builder()
+                .accessId("unknownAccessId")
+                .password("unknownPassword!")
+                .build();
+        when(this.userRepository.findByAccessId(user.getAccessId())).thenReturn(null);
 
+        // When
+        try {
+            this.userService.login(user);
+        } catch (IllegalStateException e) {
+            return;
+        }
+
+        // Then
+        fail();
     }
 
     @Test
     public void loginWillSucceed() {
+        // Given
+        User existingUser = UserMock.user;
+        Account existingAccount = existingUser.getAccount();
+        LoginUserCommand user = LoginUserCommand.builder()
+                .accessId(existingAccount.getAccessId())
+                .password(existingAccount.getPassword())
+                .build();
+        when(this.userRepository.findByAccessId(user.getAccessId())).thenReturn(existingUser);
 
+        // When
+        UUID userId = this.userService.login(user);
+
+        // Then
+        assertThat(userId).isNotEqualTo(null);
     }
 
     // 프로필 조회
