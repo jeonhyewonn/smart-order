@@ -1,22 +1,26 @@
 package com.example.smartorder.user.domain;
 
 import com.example.smartorder.order.domain.Order;
+import com.example.smartorder.user.service.dto.JoinUserCommand;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-@Getter
+@Getter @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
     @Id
-    @GeneratedValue
-    private String id;
+    private UUID id;
     @Embedded
     private Account account;
     private String name;
@@ -27,5 +31,19 @@ public class User {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Order> orders;
+    private List<Order> orders = new ArrayList<>();
+
+    public static User createBy(JoinUserCommand newUser) {
+        User user = new User();
+        user.setId(UUID.randomUUID());
+        user.setAccount(Account.createBy(newUser.getAccessId(), newUser.getPassword()));
+        user.setName(newUser.getName());
+        user.setAgeGroup(newUser.getAgeGroup());
+        user.setGender(newUser.getGender());
+        user.setTel(newUser.getTel());
+        user.setIsDeleted(false);
+        user.setCreatedAt(LocalDateTime.now());
+
+        return user;
+    }
 }
