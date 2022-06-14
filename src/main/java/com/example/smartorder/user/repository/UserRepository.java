@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -23,5 +24,9 @@ public class UserRepository {
         if (results.isEmpty()) return null;
 
         return results.get(0);
+    }
+
+    public User findById(UUID id) {
+        return this.em.find(User.class, id);
     }
 }

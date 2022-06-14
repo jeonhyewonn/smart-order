@@ -8,6 +8,7 @@ import com.example.smartorder.user.domain.User;
 import com.example.smartorder.user.repository.UserRepository;
 import com.example.smartorder.user.service.dto.JoinUserCommand;
 import com.example.smartorder.user.service.dto.LoginUserCommand;
+import com.example.smartorder.user.service.dto.UpdateProfileCommand;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -114,30 +115,85 @@ class UserServiceTest {
         assertThat(userId).isNotEqualTo(null);
     }
 
-    // 프로필 조회
-    // 존재하지 않는 사용자면 에러
-    // 존재하는 사용자면 user entity 리턴
     @Test
-    public void getProfileWithUnknownUserWillFail() {
+    public void getUserWithUnknownUserWillFail() {
+        // Given
+        UUID userId = UUID.randomUUID();
+        when(this.userRepository.findById(userId)).thenReturn(null);
 
+        // When
+        try {
+            this.userService.getUser(userId);
+        } catch (IllegalStateException e) {
+            return;
+        }
+
+        // Then
+        fail();
     }
 
     @Test
-    public void getProfileWillSucceed() {
+    public void getUserWillSucceed() {
+        // Given
+        User existingUser = UserMock.user;
+        UUID userId = existingUser.getId();
+        when(this.userRepository.findById(userId)).thenReturn(existingUser);
 
+        // When
+        User user = this.userService.getUser(userId);
+
+        // Then
+        assertThat(user).isEqualTo(existingUser);
     }
 
-    // 프로필 수정
-    // 존재하지 않는 사용자면 에러
-    // 존재하는 사용자면 데이터 수정
     @Test
     public void updateProfileWithUnknownUserWillFail() {
+        // Given
+        User existingUser = UserMock.user;
+        UUID userId = existingUser.getId();
+        UpdateProfileCommand profile = UpdateProfileCommand
+                .builder()
+                .name("newName")
+                .ageGroup(AgeGroup.Forty)
+                .gender(Gender.Women)
+                .tel("010-4321-8765")
+                .build();
+        when(this.userRepository.findById(userId)).thenReturn(null);
 
+        // When
+        try {
+            this.userService.updateProfile(userId, profile);
+        } catch (IllegalStateException e) {
+            return;
+        }
+
+        // Then
+        fail();
     }
 
     @Test
     public void updateProfileWillSucceed() {
+        // Given
+        User existingUser = UserMock.user;
+        UUID userId = existingUser.getId();
+        UpdateProfileCommand profile = UpdateProfileCommand
+                .builder()
+                .name("newName")
+                .ageGroup(AgeGroup.Forty)
+                .gender(Gender.Women)
+                .tel("010-4321-8765")
+                .build();
+        when(this.userRepository.findById(userId)).thenReturn(existingUser);
 
+        // When
+        this.userService.updateProfile(userId, profile);
+
+        // Then
+        User updatedUser = this.userRepository.findById(userId);
+        assertThat(updatedUser.getName()).isEqualTo(profile.getName());
+        assertThat(updatedUser.getAgeGroup()).isEqualTo(profile.getAgeGroup());
+        assertThat(updatedUser.getGender()).isEqualTo(profile.getGender());
+        assertThat(updatedUser.getTel()).isEqualTo(profile.getTel());
     }
 
     // 탈퇴
