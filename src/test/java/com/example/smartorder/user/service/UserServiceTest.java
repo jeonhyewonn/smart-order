@@ -149,8 +149,7 @@ class UserServiceTest {
     @Test
     public void updateProfileWithUnknownUserWillFail() {
         // Given
-        User existingUser = UserMock.user;
-        UUID userId = existingUser.getId();
+        UUID userId = UUID.randomUUID();
         UpdateProfileCommand profile = UpdateProfileCommand
                 .builder()
                 .name("newName")
@@ -200,12 +199,34 @@ class UserServiceTest {
     // 존재하지 않는 사용자면 에러
     // 존재하는 사용자면 탈퇴
     @Test
-    public void deleteAccountWithUnknownUserWillFail() {
+    public void deactivateAccountWithUnknownUserWillFail() {
+        // Given
+        UUID userId = UUID.randomUUID();
+        when(this.userRepository.findById(userId)).thenReturn(null);
 
+        // When
+        try {
+            this.userService.deactivateAccount(userId);
+        } catch (IllegalStateException e) {
+            return;
+        }
+
+        // Then
+        fail();
     }
 
     @Test
-    public void deleteAccountWillSucceed() {
+    public void deactivateAccountWillSucceed() {
+        // Given
+        User existingUser = UserMock.user;
+        UUID userId = existingUser.getId();
+        when(this.userRepository.findById(userId)).thenReturn(existingUser);
 
+        // When
+        this.userService.deactivateAccount(userId);
+
+        // Then
+        User deactivatedUser = this.userRepository.findById(userId);
+        assertThat(deactivatedUser.getIsDeleted()).isEqualTo(true);
     }
 }

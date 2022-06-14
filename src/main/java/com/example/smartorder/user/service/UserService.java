@@ -50,4 +50,12 @@ public class UserService {
 
         user.updateProfile(profile);
     }
+
+    @Transactional
+    public void deactivateAccount(UUID id) {
+        User user = this.userRepository.findById(id);
+        if (user == null) throw new IllegalStateException("UnknownUser");
+
+        user.deactivate();
+    }
 }
