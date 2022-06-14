@@ -48,10 +48,10 @@ public class User {
     }
 
     public void updateProfile(UpdateProfileCommand profile) {
-        this.setName(profile.getName());
-        this.setAgeGroup(profile.getAgeGroup());
-        this.setGender(profile.getGender());
-        this.setTel(profile.getTel());
+        if (profile.getName() != null) this.setName(profile.getName());
+        if (profile.getAgeGroup() != null) this.setAgeGroup(profile.getAgeGroup());
+        if (profile.getGender() != null) this.setGender(profile.getGender());
+        if (profile.getTel() != null) this.setTel(profile.getTel());
     }
 
     public void deactivate() {

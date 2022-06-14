@@ -178,8 +178,6 @@ class UserServiceTest {
         UpdateProfileCommand profile = UpdateProfileCommand
                 .builder()
                 .name("newName")
-                .ageGroup(AgeGroup.Forty)
-                .gender(Gender.Women)
                 .tel("010-4321-8765")
                 .build();
         when(this.userRepository.findById(userId)).thenReturn(existingUser);
@@ -190,8 +188,6 @@ class UserServiceTest {
         // Then
         User updatedUser = this.userRepository.findById(userId);
         assertThat(updatedUser.getName()).isEqualTo(profile.getName());
-        assertThat(updatedUser.getAgeGroup()).isEqualTo(profile.getAgeGroup());
-        assertThat(updatedUser.getGender()).isEqualTo(profile.getGender());
         assertThat(updatedUser.getTel()).isEqualTo(profile.getTel());
     }
 
