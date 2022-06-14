@@ -53,4 +53,8 @@ public class User {
         this.setGender(profile.getGender());
         this.setTel(profile.getTel());
     }
+
+    public void deactivate() {
+        this.setIsDeleted(true);
+    }
 }
