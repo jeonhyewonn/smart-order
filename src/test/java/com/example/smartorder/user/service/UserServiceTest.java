@@ -1,7 +1,6 @@
 package com.example.smartorder.user.service;
 
 import com.example.smartorder.user.UserMock;
-import com.example.smartorder.user.domain.Account;
 import com.example.smartorder.user.domain.AgeGroup;
 import com.example.smartorder.user.domain.Gender;
 import com.example.smartorder.user.domain.User;
@@ -11,10 +10,11 @@ import com.example.smartorder.user.service.dto.LoginUserCommand;
 import com.example.smartorder.user.service.dto.UpdateProfileCommand;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.UUID;
 
@@ -25,11 +25,15 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-    @InjectMocks
-    private UserService userService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
-    @Mock
-    private UserRepository userRepository;
+    public UserServiceTest() {
+        this.userRepository = Mockito.mock(UserRepository.class);
+        this.passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        this.userService = new UserService(this.userRepository, this.passwordEncoder);
+    }
 
     @Test
     public void joinWithExistingUserWillFail() {
@@ -42,7 +46,7 @@ class UserServiceTest {
                 .gender(Gender.Women)
                 .tel("01012345678")
                 .build();
-        User existingUser = User.createBy(user);
+        User existingUser = User.createBy(user, this.passwordEncoder.encode(user.getPassword()));
         when(this.userRepository.findByAccessId(user.getAccessId())).thenReturn(existingUser);
 
         // When
@@ -101,10 +105,9 @@ class UserServiceTest {
     public void loginWillSucceed() {
         // Given
         User existingUser = UserMock.user;
-        Account existingAccount = existingUser.getAccount();
         LoginUserCommand user = LoginUserCommand.builder()
-                .accessId(existingAccount.getAccessId())
-                .password(existingAccount.getPassword())
+                .accessId(existingUser.getAccessId())
+                .password(existingUser.getPassword())
                 .build();
         when(this.userRepository.findByAccessId(user.getAccessId())).thenReturn(existingUser);
 
@@ -191,9 +194,62 @@ class UserServiceTest {
         assertThat(updatedUser.getTel()).isEqualTo(profile.getTel());
     }
 
-    // 탈퇴
-    // 존재하지 않는 사용자면 에러
-    // 존재하는 사용자면 탈퇴
+    @Test
+    public void changePasswordWithUnknownUserWillFail() {
+        // Given
+        UUID userId = UUID.randomUUID();
+        String oriPassword = "oriPassword";
+        String newPassword = "newPassword";
+        when(this.userRepository.findById(userId)).thenReturn(null);
+
+        // When
+        try {
+            this.userService.changePassword(userId, oriPassword, newPassword);
+        } catch (IllegalStateException e) {
+            return;
+        }
+
+        // Then
+        fail();
+    }
+
+    @Test
+    public void changePasswordWithIncorrectOldPasswordWillFail() {
+        // Given
+        User existingUser = UserMock.user;
+        UUID userId = existingUser.getId();
+        String oriPassword = "oriPassword";
+        String newPassword = "newPassword";
+        when(this.userRepository.findById(userId)).thenReturn(existingUser);
+
+        // When
+        try {
+            this.userService.changePassword(userId, oriPassword, newPassword);
+        } catch (IllegalStateException e) {
+            return;
+        }
+
+        // Then
+        fail();
+    }
+
+    @Test
+    public void changePasswordWillSucceed() {
+        // Given
+        User existingUser = UserMock.user;
+        UUID userId = existingUser.getId();
+        String oriPassword = UserMock.joinUserCmd.getPassword();
+        String newPassword = "newPassword";
+        when(this.userRepository.findById(userId)).thenReturn(existingUser);
+
+        // When
+        this.userService.changePassword(userId, oriPassword, newPassword);
+
+        // Then
+        User updatedUser = this.userRepository.findById(userId);
+        assertThat(this.passwordEncoder.matches(newPassword, updatedUser.getPassword())).isEqualTo(true);
+    }
+
     @Test
     public void deactivateAccountWithUnknownUserWillFail() {
         // Given
