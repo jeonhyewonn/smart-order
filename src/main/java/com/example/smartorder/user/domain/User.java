@@ -21,8 +21,8 @@ import java.util.UUID;
 public class User {
     @Id
     private UUID id;
-    @Embedded
-    private Account account;
+    private String accessId;
+    private String password;
     private String name;
     private AgeGroup ageGroup;
     private Gender gender;
@@ -33,10 +33,11 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Order> orders = new ArrayList<>();
 
-    public static User createBy(JoinUserCommand newUser) {
+    public static User createBy(JoinUserCommand newUser, String encodedPassword) {
         User user = new User();
         user.setId(UUID.randomUUID());
-        user.setAccount(Account.createBy(newUser.getAccessId(), newUser.getPassword()));
+        user.setAccessId(newUser.getAccessId());
+        user.setPassword(encodedPassword);
         user.setName(newUser.getName());
         user.setAgeGroup(newUser.getAgeGroup());
         user.setGender(newUser.getGender());
@@ -52,6 +53,10 @@ public class User {
         if (profile.getAgeGroup() != null) this.setAgeGroup(profile.getAgeGroup());
         if (profile.getGender() != null) this.setGender(profile.getGender());
         if (profile.getTel() != null) this.setTel(profile.getTel());
+    }
+
+    public void changePassword(String password) {
+        this.setPassword(password);
     }
 
     public void deactivate() {
