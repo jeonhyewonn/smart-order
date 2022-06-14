@@ -8,6 +8,7 @@ import com.example.smartorder.user.repository.UserRepository;
 import com.example.smartorder.user.service.dto.JoinUserCommand;
 import com.example.smartorder.user.service.dto.LoginUserCommand;
 import com.example.smartorder.user.service.dto.UpdateProfileCommand;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -28,6 +29,7 @@ class UserServiceTest {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
+    private UserMock userMock;
 
     public UserServiceTest() {
         this.userRepository = Mockito.mock(UserRepository.class);
@@ -35,10 +37,15 @@ class UserServiceTest {
         this.userService = new UserService(this.userRepository, this.passwordEncoder);
     }
 
+    @BeforeEach
+    public void beforeEach() {
+        this.userMock = new UserMock();
+    }
+
     @Test
     public void joinWithExistingUserWillFail() {
         // Given
-        JoinUserCommand user = JoinUserCommand.builder()
+        JoinUserCommand joinUser = JoinUserCommand.builder()
                 .accessId("existingId")
                 .password("testPassword!")
                 .name("테스트")
@@ -46,12 +53,12 @@ class UserServiceTest {
                 .gender(Gender.Women)
                 .tel("01012345678")
                 .build();
-        User existingUser = User.createBy(user, this.passwordEncoder.encode(user.getPassword()));
-        when(this.userRepository.findByAccessId(user.getAccessId())).thenReturn(existingUser);
+        User existingUser = User.createBy(joinUser, this.passwordEncoder.encode(joinUser.getPassword()));
+        when(this.userRepository.findByAccessId(joinUser.getAccessId())).thenReturn(existingUser);
 
         // When
         try {
-            this.userService.join(user);
+            this.userService.join(joinUser);
         } catch (IllegalStateException e) {
             return;
         }
@@ -64,7 +71,7 @@ class UserServiceTest {
     public void joinWillSucceed() {
         // Given
         String accessId = "newId";
-        JoinUserCommand user = JoinUserCommand.builder()
+        JoinUserCommand joinUser = JoinUserCommand.builder()
                 .accessId(accessId)
                 .password("testPassword!")
                 .name("테스트")
@@ -72,10 +79,10 @@ class UserServiceTest {
                 .gender(Gender.Women)
                 .tel("01012345678")
                 .build();
-        when(this.userRepository.findByAccessId(user.getAccessId())).thenReturn(null);
+        when(this.userRepository.findByAccessId(joinUser.getAccessId())).thenReturn(null);
 
         // When
-        UUID userId = this.userService.join(user);
+        UUID userId = this.userService.join(joinUser);
 
         // Then
         assertThat(userId).isNotEqualTo(null);
@@ -84,15 +91,36 @@ class UserServiceTest {
     @Test
     public void loginWithUnknownUserWillFail() {
         // Given
-        LoginUserCommand user = LoginUserCommand.builder()
+        LoginUserCommand loginUser = LoginUserCommand.builder()
                 .accessId("unknownAccessId")
                 .password("unknownPassword!")
                 .build();
-        when(this.userRepository.findByAccessId(user.getAccessId())).thenReturn(null);
+        when(this.userRepository.findByAccessId(loginUser.getAccessId())).thenReturn(null);
 
         // When
         try {
-            this.userService.login(user);
+            this.userService.login(loginUser);
+        } catch (IllegalStateException e) {
+            return;
+        }
+
+        // Then
+        fail();
+    }
+
+    @Test
+    public void loginWithIncorrectPasswordWillFail() {
+        // Given
+        User existingUser = this.userMock.user;
+        LoginUserCommand loginUser = LoginUserCommand.builder()
+                .accessId(existingUser.getAccessId())
+                .password("incorrectPassword!")
+                .build();
+        when(this.userRepository.findByAccessId(loginUser.getAccessId())).thenReturn(existingUser);
+
+        // When
+        try {
+            this.userService.login(loginUser);
         } catch (IllegalStateException e) {
             return;
         }
@@ -104,15 +132,16 @@ class UserServiceTest {
     @Test
     public void loginWillSucceed() {
         // Given
-        User existingUser = UserMock.user;
-        LoginUserCommand user = LoginUserCommand.builder()
+        String existingRawPassword = this.userMock.joinUserCmd.getPassword();
+        User existingUser = this.userMock.user;
+        LoginUserCommand loginUser = LoginUserCommand.builder()
                 .accessId(existingUser.getAccessId())
-                .password(existingUser.getPassword())
+                .password(existingRawPassword)
                 .build();
-        when(this.userRepository.findByAccessId(user.getAccessId())).thenReturn(existingUser);
+        when(this.userRepository.findByAccessId(loginUser.getAccessId())).thenReturn(existingUser);
 
         // When
-        UUID userId = this.userService.login(user);
+        UUID userId = this.userService.login(loginUser);
 
         // Then
         assertThat(userId).isNotEqualTo(null);
@@ -138,7 +167,7 @@ class UserServiceTest {
     @Test
     public void getUserWillSucceed() {
         // Given
-        User existingUser = UserMock.user;
+        User existingUser = this.userMock.user;
         UUID userId = existingUser.getId();
         when(this.userRepository.findById(userId)).thenReturn(existingUser);
 
@@ -176,7 +205,7 @@ class UserServiceTest {
     @Test
     public void updateProfileWillSucceed() {
         // Given
-        User existingUser = UserMock.user;
+        User existingUser = this.userMock.user;
         UUID userId = existingUser.getId();
         UpdateProfileCommand profile = UpdateProfileCommand
                 .builder()
@@ -216,7 +245,7 @@ class UserServiceTest {
     @Test
     public void changePasswordWithIncorrectOldPasswordWillFail() {
         // Given
-        User existingUser = UserMock.user;
+        User existingUser = this.userMock.user;
         UUID userId = existingUser.getId();
         String oriPassword = "oriPassword";
         String newPassword = "newPassword";
@@ -236,9 +265,9 @@ class UserServiceTest {
     @Test
     public void changePasswordWillSucceed() {
         // Given
-        User existingUser = UserMock.user;
+        User existingUser = this.userMock.user;
         UUID userId = existingUser.getId();
-        String oriPassword = UserMock.joinUserCmd.getPassword();
+        String oriPassword = this.userMock.joinUserCmd.getPassword();
         String newPassword = "newPassword";
         when(this.userRepository.findById(userId)).thenReturn(existingUser);
 
@@ -270,7 +299,7 @@ class UserServiceTest {
     @Test
     public void deactivateAccountWillSucceed() {
         // Given
-        User existingUser = UserMock.user;
+        User existingUser = this.userMock.user;
         UUID userId = existingUser.getId();
         when(this.userRepository.findById(userId)).thenReturn(existingUser);
 
