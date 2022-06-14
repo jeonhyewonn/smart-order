@@ -2,11 +2,11 @@ package com.example.smartorder.user.domain;
 
 import com.example.smartorder.order.domain.Order;
 import com.example.smartorder.user.service.dto.JoinUserCommand;
+import com.example.smartorder.user.service.dto.UpdateProfileCommand;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -45,5 +45,12 @@ public class User {
         user.setCreatedAt(LocalDateTime.now());
 
         return user;
+    }
+
+    public void updateProfile(UpdateProfileCommand profile) {
+        this.setName(profile.getName());
+        this.setAgeGroup(profile.getAgeGroup());
+        this.setGender(profile.getGender());
+        this.setTel(profile.getTel());
     }
 }
