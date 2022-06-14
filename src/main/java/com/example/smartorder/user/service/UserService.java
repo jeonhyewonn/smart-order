@@ -22,19 +22,20 @@ public class UserService {
     }
 
     @Transactional
-    public UUID join(JoinUserCommand user) {
-        User existingUser = this.userRepository.findByAccessId(user.getAccessId());
+    public UUID join(JoinUserCommand joinUser) {
+        User existingUser = this.userRepository.findByAccessId(joinUser.getAccessId());
         if (existingUser != null) throw new IllegalStateException("ExistingUser");
 
-        User newUser = User.createBy(user, this.passwordEncoder.encode(user.getPassword()));
+        User newUser = User.createBy(joinUser, this.passwordEncoder.encode(joinUser.getPassword()));
         this.userRepository.save(newUser);
 
         return newUser.getId();
     }
 
-    public UUID login(LoginUserCommand user) {
-        User existingUser = this.userRepository.findByAccessId(user.getAccessId());
+    public UUID login(LoginUserCommand loginUser) {
+        User existingUser = this.userRepository.findByAccessId(loginUser.getAccessId());
         if (existingUser == null) throw new IllegalStateException("UnknownUser");
+        if (!this.passwordEncoder.matches(loginUser.getPassword(), existingUser.getPassword())) throw new IllegalStateException("IncorrectPassword");
 
         return existingUser.getId();
     }
@@ -58,7 +59,6 @@ public class UserService {
     public void changePassword(UUID id, String oriPassword, String newPassword) {
         User user = this.userRepository.findById(id);
         if (user == null) throw new IllegalStateException("UnknownUser");
-
         if (!this.passwordEncoder.matches(oriPassword, user.getPassword())) throw new IllegalStateException("IncorrectPassword");
 
         user.changePassword(this.passwordEncoder.encode(newPassword));
