@@ -27,4 +27,11 @@ public class UserService {
 
         return newUser.getId();
     }
+
+    public UUID login(LoginUserCommand user) {
+        User existingUser = this.userRepository.findByAccessId(user.getAccessId());
+        if (existingUser == null) throw new IllegalStateException("UnknownUser");
+
+        return existingUser.getId();
+    }
 }
