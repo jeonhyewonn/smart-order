@@ -20,8 +20,6 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
     @Id
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid2")
     private UUID id;
     @Embedded
     private Account account;
@@ -37,6 +35,7 @@ public class User {
 
     public static User createBy(JoinUserCommand newUser) {
         User user = new User();
+        user.setId(UUID.randomUUID());
         user.setAccount(Account.createBy(newUser.getAccessId(), newUser.getPassword()));
         user.setName(newUser.getName());
         user.setAgeGroup(newUser.getAgeGroup());

@@ -16,7 +16,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -68,9 +67,7 @@ class UserServiceTest {
                 .gender(Gender.Women)
                 .tel("01012345678")
                 .build();
-        User newUser = User.createBy(user);
-
-        doReturn(null).when(this.userRepository).findByAccessId(accessId);
+        when(this.userRepository.findByAccessId(user.getAccessId())).thenReturn(null);
 
         // When
         UUID userId = this.userService.join(user);
