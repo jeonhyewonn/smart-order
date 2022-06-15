@@ -9,8 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 public class MemberService {
     private final MemberRepository memberRepository;
@@ -22,25 +20,25 @@ public class MemberService {
     }
 
     @Transactional
-    public UUID join(JoinMemberCommand joinMember) {
+    public Member join(JoinMemberCommand joinMember) {
         Member existingMember = this.memberRepository.findByAccessId(joinMember.getAccessId());
         if (existingMember != null) throw new IllegalStateException("ExistingMember");
 
         Member newMember = Member.createBy(joinMember, this.passwordEncoder.encode(joinMember.getPassword()));
         this.memberRepository.save(newMember);
 
-        return newMember.getId();
+        return newMember;
     }
 
-    public UUID login(LoginMemberCommand loginMember) {
+    public Member login(LoginMemberCommand loginMember) {
         Member existingMember = this.memberRepository.findByAccessId(loginMember.getAccessId());
         if (existingMember == null) throw new IllegalStateException("UnknownMember");
         if (!this.passwordEncoder.matches(loginMember.getPassword(), existingMember.getPassword())) throw new IllegalStateException("IncorrectPassword");
 
-        return existingMember.getId();
+        return existingMember;
     }
 
-    public Member getMember(UUID id) {
+    public Member getMember(String id) {
         Member member = this.memberRepository.findById(id);
         if (member == null) throw new IllegalStateException("UnknownMember");
 
@@ -48,7 +46,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void updateProfile(UUID id, UpdateProfileCommand profile) {
+    public void updateProfile(String id, UpdateProfileCommand profile) {
         Member member = this.memberRepository.findById(id);
         if (member == null) throw new IllegalStateException("UnknownMember");
 
@@ -56,7 +54,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void changePassword(UUID id, String oriPassword, String newPassword) {
+    public void changePassword(String id, String oriPassword, String newPassword) {
         Member member = this.memberRepository.findById(id);
         if (member == null) throw new IllegalStateException("UnknownMember");
         if (!this.passwordEncoder.matches(oriPassword, member.getPassword())) throw new IllegalStateException("IncorrectPassword");
@@ -65,7 +63,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void deactivateAccount(UUID id) {
+    public void deactivateAccount(String id) {
         Member member = this.memberRepository.findById(id);
         if (member == null) throw new IllegalStateException("UnknownMember");
 
