@@ -6,10 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
-import java.util.UUID;
 
-@Repository
 @RequiredArgsConstructor
+@Repository
 public class MemberRepository {
     private final EntityManager em;
 
@@ -18,7 +17,7 @@ public class MemberRepository {
     }
 
     public Member findByAccessId(String accessId) {
-        List<Member> results = this.em.createQuery("SELECT u FROM Member u WHERE u.account.accessId = :accessId", Member.class)
+        List<Member> results = this.em.createQuery("SELECT u FROM Member u WHERE u.accessId = :accessId", Member.class)
                 .setParameter("accessId", accessId)
                 .getResultList();
         if (results.isEmpty()) return null;
@@ -26,7 +25,7 @@ public class MemberRepository {
         return results.get(0);
     }
 
-    public Member findById(UUID id) {
+    public Member findById(String id) {
         return this.em.find(Member.class, id);
     }
 }
