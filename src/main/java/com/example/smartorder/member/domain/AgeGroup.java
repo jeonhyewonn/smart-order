@@ -1,4 +1,4 @@
-package com.example.smartorder.user.domain;
+package com.example.smartorder.member.domain;
 
 public enum AgeGroup {
     Twenty,

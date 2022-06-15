@@ -1,8 +1,8 @@
-package com.example.smartorder.user.domain;
+package com.example.smartorder.member.domain;
 
 import com.example.smartorder.order.domain.Order;
-import com.example.smartorder.user.service.dto.JoinUserCommand;
-import com.example.smartorder.user.service.dto.UpdateProfileCommand;
+import com.example.smartorder.member.service.dto.JoinMemberCommand;
+import com.example.smartorder.member.service.dto.UpdateProfileCommand;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name = "members")
 @Getter @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
+public class Member {
     @Id
     private UUID id;
     private String accessId;
@@ -30,22 +30,22 @@ public class User {
     private Boolean isDeleted;
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Order> orders = new ArrayList<>();
 
-    public static User createBy(JoinUserCommand newUser, String encodedPassword) {
-        User user = new User();
-        user.setId(UUID.randomUUID());
-        user.setAccessId(newUser.getAccessId());
-        user.setPassword(encodedPassword);
-        user.setName(newUser.getName());
-        user.setAgeGroup(newUser.getAgeGroup());
-        user.setGender(newUser.getGender());
-        user.setTel(newUser.getTel());
-        user.setIsDeleted(false);
-        user.setCreatedAt(LocalDateTime.now());
+    public static Member createBy(JoinMemberCommand newMember, String encodedPassword) {
+        Member member = new Member();
+        member.setId(UUID.randomUUID());
+        member.setAccessId(newMember.getAccessId());
+        member.setPassword(encodedPassword);
+        member.setName(newMember.getName());
+        member.setAgeGroup(newMember.getAgeGroup());
+        member.setGender(newMember.getGender());
+        member.setTel(newMember.getTel());
+        member.setIsDeleted(false);
+        member.setCreatedAt(LocalDateTime.now());
 
-        return user;
+        return member;
     }
 
     public void updateProfile(UpdateProfileCommand profile) {

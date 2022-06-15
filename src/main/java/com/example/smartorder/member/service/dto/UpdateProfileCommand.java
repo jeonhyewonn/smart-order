@@ -1,7 +1,7 @@
-package com.example.smartorder.user.service.dto;
+package com.example.smartorder.member.service.dto;
 
-import com.example.smartorder.user.domain.AgeGroup;
-import com.example.smartorder.user.domain.Gender;
+import com.example.smartorder.member.domain.AgeGroup;
+import com.example.smartorder.member.domain.Gender;
 import lombok.Builder;
 import lombok.Getter;
 
