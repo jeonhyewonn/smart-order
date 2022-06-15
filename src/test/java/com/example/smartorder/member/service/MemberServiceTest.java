@@ -82,10 +82,10 @@ class MemberServiceTest {
         when(this.memberRepository.findByAccessId(joinMember.getAccessId())).thenReturn(null);
 
         // When
-        UUID memberId = this.memberService.join(joinMember);
+        Member member = this.memberService.join(joinMember);
 
         // Then
-        assertThat(memberId).isNotEqualTo(null);
+        assertThat(joinMember.getAccessId()).isEqualTo(member.getAccessId());
     }
 
     @Test
@@ -141,16 +141,16 @@ class MemberServiceTest {
         when(this.memberRepository.findByAccessId(loginMember.getAccessId())).thenReturn(existingMember);
 
         // When
-        UUID memberId = this.memberService.login(loginMember);
+        Member member = this.memberService.login(loginMember);
 
         // Then
-        assertThat(memberId).isNotEqualTo(null);
+        assertThat(loginMember.getAccessId()).isEqualTo(member.getAccessId());
     }
 
     @Test
     public void getMemberWithUnknownMemberWillFail() {
         // Given
-        UUID memberId = UUID.randomUUID();
+        String memberId = UUID.randomUUID().toString();
         when(this.memberRepository.findById(memberId)).thenReturn(null);
 
         // When
@@ -168,7 +168,7 @@ class MemberServiceTest {
     public void getMemberWillSucceed() {
         // Given
         Member existingMember = this.memberMock.member;
-        UUID memberId = existingMember.getId();
+        String memberId = existingMember.getId();
         when(this.memberRepository.findById(memberId)).thenReturn(existingMember);
 
         // When
@@ -181,7 +181,7 @@ class MemberServiceTest {
     @Test
     public void updateProfileWithUnknownMemberWillFail() {
         // Given
-        UUID memberId = UUID.randomUUID();
+        String memberId = UUID.randomUUID().toString();
         UpdateProfileCommand profile = UpdateProfileCommand
                 .builder()
                 .name("newName")
@@ -206,7 +206,7 @@ class MemberServiceTest {
     public void updateProfileWillSucceed() {
         // Given
         Member existingMember = this.memberMock.member;
-        UUID memberId = existingMember.getId();
+        String memberId = existingMember.getId();
         UpdateProfileCommand profile = UpdateProfileCommand
                 .builder()
                 .name("newName")
@@ -226,7 +226,7 @@ class MemberServiceTest {
     @Test
     public void changePasswordWithUnknownMemberWillFail() {
         // Given
-        UUID memberId = UUID.randomUUID();
+        String memberId = UUID.randomUUID().toString();
         String oriPassword = "oriPassword";
         String newPassword = "newPassword";
         when(this.memberRepository.findById(memberId)).thenReturn(null);
@@ -246,7 +246,7 @@ class MemberServiceTest {
     public void changePasswordWithIncorrectOldPasswordWillFail() {
         // Given
         Member existingMember = this.memberMock.member;
-        UUID memberId = existingMember.getId();
+        String memberId = existingMember.getId();
         String oriPassword = "oriPassword";
         String newPassword = "newPassword";
         when(this.memberRepository.findById(memberId)).thenReturn(existingMember);
@@ -266,7 +266,7 @@ class MemberServiceTest {
     public void changePasswordWillSucceed() {
         // Given
         Member existingMember = this.memberMock.member;
-        UUID memberId = existingMember.getId();
+        String memberId = existingMember.getId();
         String oriPassword = this.memberMock.joinMemberCmd.getPassword();
         String newPassword = "newPassword";
         when(this.memberRepository.findById(memberId)).thenReturn(existingMember);
@@ -282,7 +282,7 @@ class MemberServiceTest {
     @Test
     public void deactivateAccountWithUnknownMemberWillFail() {
         // Given
-        UUID memberId = UUID.randomUUID();
+        String memberId = UUID.randomUUID().toString();
         when(this.memberRepository.findById(memberId)).thenReturn(null);
 
         // When
@@ -300,7 +300,7 @@ class MemberServiceTest {
     public void deactivateAccountWillSucceed() {
         // Given
         Member existingMember = this.memberMock.member;
-        UUID memberId = existingMember.getId();
+        String memberId = existingMember.getId();
         when(this.memberRepository.findById(memberId)).thenReturn(existingMember);
 
         // When

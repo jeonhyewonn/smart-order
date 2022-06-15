@@ -20,14 +20,27 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
     @Id
-    private UUID id;
+    private String id;
+
     private String accessId;
+
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     private String name;
+
+    @Enumerated(EnumType.STRING)
     private AgeGroup ageGroup;
+
+    @Enumerated(EnumType.STRING)
     private Gender gender;
+
     private String tel;
+
     private Boolean isDeleted;
+
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
@@ -35,9 +48,10 @@ public class Member {
 
     public static Member createBy(JoinMemberCommand newMember, String encodedPassword) {
         Member member = new Member();
-        member.setId(UUID.randomUUID());
+        member.setId(UUID.randomUUID().toString());
         member.setAccessId(newMember.getAccessId());
         member.setPassword(encodedPassword);
+        member.setRole(Role.CLIENT);
         member.setName(newMember.getName());
         member.setAgeGroup(newMember.getAgeGroup());
         member.setGender(newMember.getGender());
