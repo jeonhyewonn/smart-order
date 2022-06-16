@@ -1,4 +1,4 @@
-package com.example.smartorder.member.controller.dto;
+package com.example.smartorder.member.controller.dto.request;
 
 import lombok.Getter;
 
