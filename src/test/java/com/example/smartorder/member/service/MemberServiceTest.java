@@ -49,8 +49,8 @@ class MemberServiceTest {
                 .accessId("existingId")
                 .password("testPassword!")
                 .name("테스트")
-                .ageGroup(AgeGroup.Thirty)
-                .gender(Gender.Women)
+                .ageGroup(AgeGroup.THIRTY)
+                .gender(Gender.WOMEN)
                 .tel("01012345678")
                 .build();
         Member existingMember = Member.createBy(joinMember, this.passwordEncoder.encode(joinMember.getPassword()));
@@ -75,8 +75,8 @@ class MemberServiceTest {
                 .accessId(accessId)
                 .password("testPassword!")
                 .name("테스트")
-                .ageGroup(AgeGroup.Thirty)
-                .gender(Gender.Women)
+                .ageGroup(AgeGroup.THIRTY)
+                .gender(Gender.WOMEN)
                 .tel("01012345678")
                 .build();
         when(this.memberRepository.findByAccessId(joinMember.getAccessId())).thenReturn(null);
@@ -185,8 +185,8 @@ class MemberServiceTest {
         UpdateProfileCommand profile = UpdateProfileCommand
                 .builder()
                 .name("newName")
-                .ageGroup(AgeGroup.Forty)
-                .gender(Gender.Women)
+                .ageGroup(AgeGroup.FORTY)
+                .gender(Gender.WOMEN)
                 .tel("010-4321-8765")
                 .build();
         when(this.memberRepository.findById(memberId)).thenReturn(null);

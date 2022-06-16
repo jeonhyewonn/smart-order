@@ -17,6 +17,9 @@ spring:
         show_sql: false
         format_sql: false
 
+  jackson:
+    default-property-inclusion: NON_NULL
+
 logging:
   level:
     org.hibernate.SQL: debug
@@ -25,4 +28,4 @@ logging:
 jwt:
   secret: testJwtSecret
   expiration:
-    access: 60000
+    access: 3600000

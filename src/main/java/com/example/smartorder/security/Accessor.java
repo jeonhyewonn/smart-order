@@ -1,7 +1,5 @@
 package com.example.smartorder.security;
 
-import com.example.smartorder.member.domain.Member;
-import com.example.smartorder.member.domain.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -9,16 +7,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 public class Accessor implements UserDetails {
-    private final Member member;
+    private final String roleName;
+    private final String id;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Role role = this.member.getRole();
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(role.toString());
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(this.roleName);
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(authority);
 
@@ -30,7 +27,7 @@ public class Accessor implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.member.getAccessId();
+        return this.id;
     }
 
     @Override
