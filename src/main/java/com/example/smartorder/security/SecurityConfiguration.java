@@ -26,6 +26,7 @@ public class SecurityConfiguration {
                 .csrf().disable() // 사이트 간 요청 위조
                 .authorizeHttpRequests((authz) -> authz
                         .antMatchers("/sign-*").permitAll() // sign-으로 시작하는 API는 허용
+                        .antMatchers("/items").permitAll()
                         .anyRequest().authenticated() // 그 외에는 모두 인증 과정 거쳐야 함
                 )
                 .sessionManagement()
