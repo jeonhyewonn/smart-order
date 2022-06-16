@@ -13,8 +13,8 @@ public class MemberMock {
             .accessId("mockAccessId")
             .password("testPassword!")
             .name("테스트")
-            .ageGroup(AgeGroup.Thirty)
-            .gender(Gender.Women)
+            .ageGroup(AgeGroup.THIRTY)
+            .gender(Gender.WOMEN)
             .tel("01012345678")
             .build();
     public final Member member = Member.createBy(
