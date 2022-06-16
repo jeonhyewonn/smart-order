@@ -1,7 +1,8 @@
 package com.example.smartorder.security.jwt;
 
 import com.example.smartorder.member.domain.Member;
-import com.example.smartorder.security.AccessorService;
+import com.example.smartorder.security.Accessor;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.Base64;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Component
@@ -26,8 +30,6 @@ public class JwtTokenProvider {
 
     @Value("${jwt.expiration.access}")
     private long accessTokenExpiration;
-
-    private final AccessorService accessorService;
 
     @PostConstruct
     protected void init() {
@@ -51,12 +53,14 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        String id = Jwts.parser()
+        Claims claims = Jwts.parser()
                 .setSigningKey(this.secretKey)
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-        UserDetails accessor = accessorService.loadUserByUsername(id);
+                .getBody();
+        String roleName = (String) claims.get("role");
+        String id = claims.getSubject();
+
+        UserDetails accessor = new Accessor(roleName, id);
 
         return new UsernamePasswordAuthenticationToken(accessor, "", accessor.getAuthorities());
     }

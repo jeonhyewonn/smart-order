@@ -1,4 +1,4 @@
-package com.example.smartorder.member.controller.dto;
+package com.example.smartorder.member.controller.dto.request;
 
 import com.example.smartorder.member.domain.AgeGroup;
 import com.example.smartorder.member.domain.Gender;
@@ -13,7 +13,7 @@ public class SignUpRequest extends SignRequest {
     @Size(max=20)
     private String name;
 
-    // TODO: enum validation
+    // TODO: enum validation (toUpperCase)
     private String ageGroup;
     private String gender;
     private String tel;
