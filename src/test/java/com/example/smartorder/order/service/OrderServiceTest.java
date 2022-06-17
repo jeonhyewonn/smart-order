@@ -2,12 +2,15 @@ package com.example.smartorder.order.service;
 
 import com.example.smartorder.item.ItemMock;
 import com.example.smartorder.item.domain.Item;
+import com.example.smartorder.item.exception.UnknownItemException;
 import com.example.smartorder.item.repository.ItemRepository;
 import com.example.smartorder.member.MemberMock;
 import com.example.smartorder.member.domain.Member;
+import com.example.smartorder.member.exception.UnknownMemberException;
 import com.example.smartorder.member.repository.MemberRepository;
 import com.example.smartorder.order.domain.Order;
 import com.example.smartorder.order.domain.OrderItem;
+import com.example.smartorder.order.exception.IncorrectTotalAmountException;
 import com.example.smartorder.order.repository.OrderRepository;
 import com.example.smartorder.order.service.dto.OrderCommand;
 import com.example.smartorder.order.service.dto.OrderItemCommand;
@@ -35,7 +38,7 @@ class OrderServiceTest {
     }
 
     @Test
-    public void putOrderWithUnknownMemberWillFail() {
+    public void putOrderWithUnknownMemberThrowUnknownMemberException() {
         // Given
         String memberId = "unknownMemberId";
         OrderItemCommand orderItem = OrderItemCommand.builder()
@@ -51,7 +54,7 @@ class OrderServiceTest {
         // When
         try {
             this.orderService.putOrder(memberId, order);
-        } catch (IllegalStateException e) {
+        } catch (UnknownMemberException e) {
             return;
         }
 
@@ -60,7 +63,7 @@ class OrderServiceTest {
     }
 
     @Test
-    public void putOrderWithWrongItemWillFail() {
+    public void putOrderWithWrongItemThrowUnknownItemException() {
         // Given
         Member member = new MemberMock().member;
         String memberId = member.getId();
@@ -81,7 +84,7 @@ class OrderServiceTest {
         // When
         try {
             this.orderService.putOrder(memberId, order);
-        } catch (IllegalStateException e) {
+        } catch (UnknownItemException e) {
             return;
         }
 
@@ -90,7 +93,7 @@ class OrderServiceTest {
     }
 
     @Test
-    public void putOrderWithWrongTotalAmountWillFail() {
+    public void putOrderWithWrongTotalAmountThrowIncorrectTotalAmountException() {
         // Given
         Member member = new MemberMock().member;
         String memberId = member.getId();
@@ -112,7 +115,7 @@ class OrderServiceTest {
         // When
         try {
             this.orderService.putOrder(memberId, order);
-        } catch (IllegalStateException e) {
+        } catch (IncorrectTotalAmountException e) {
             return;
         }
 
