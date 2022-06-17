@@ -6,7 +6,7 @@ import com.example.smartorder.member.domain.Gender;
 import com.example.smartorder.member.domain.Member;
 import com.example.smartorder.member.exception.AlreadyExistingMemberException;
 import com.example.smartorder.member.exception.IncorrectPasswordException;
-import com.example.smartorder.member.exception.UnknownMemberException;
+import com.example.smartorder.member.exception.NotFoundMemberException;
 import com.example.smartorder.member.repository.MemberRepository;
 import com.example.smartorder.member.service.dto.JoinMemberCommand;
 import com.example.smartorder.member.service.dto.LoginMemberCommand;
@@ -87,7 +87,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void loginWithUnknownMemberThrowUnknownMemberException() {
+    public void loginWithUnknownMemberThrowNotFoundMemberException() {
         // Given
         LoginMemberCommand loginMember = LoginMemberCommand.builder()
                 .accessId("unknownAccessId")
@@ -98,7 +98,7 @@ class MemberServiceTest {
         // When
         try {
             this.memberService.login(loginMember);
-        } catch (UnknownMemberException e) {
+        } catch (NotFoundMemberException e) {
             return;
         }
 
@@ -146,7 +146,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void getMemberWithUnknownMemberThrowUnknownMemberException() {
+    public void getMemberWithUnknownMemberThrowNotFoundMemberException() {
         // Given
         String memberId = UUID.randomUUID().toString();
         when(this.memberRepository.findById(memberId)).thenReturn(null);
@@ -154,7 +154,7 @@ class MemberServiceTest {
         // When
         try {
             this.memberService.getMember(memberId);
-        } catch (UnknownMemberException e) {
+        } catch (NotFoundMemberException e) {
             return;
         }
 
@@ -177,7 +177,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void updateProfileWithUnknownMemberThrowUnknownMemberException() {
+    public void updateProfileWithUnknownMemberThrowNotFoundMemberException() {
         // Given
         String memberId = UUID.randomUUID().toString();
         UpdateProfileCommand profile = UpdateProfileCommand
@@ -192,7 +192,7 @@ class MemberServiceTest {
         // When
         try {
             this.memberService.updateProfile(memberId, profile);
-        } catch (UnknownMemberException e) {
+        } catch (NotFoundMemberException e) {
             return;
         }
 
@@ -222,7 +222,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void changePasswordWithUnknownMemberThrowUnknownMemberException() {
+    public void changePasswordWithUnknownMemberThrowNotFoundMemberException() {
         // Given
         String memberId = UUID.randomUUID().toString();
         String oriPassword = "oriPassword";
@@ -232,7 +232,7 @@ class MemberServiceTest {
         // When
         try {
             this.memberService.changePassword(memberId, oriPassword, newPassword);
-        } catch (UnknownMemberException e) {
+        } catch (NotFoundMemberException e) {
             return;
         }
 
@@ -278,7 +278,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void deactivateAccountWithUnknownMemberThrowUnknownMemberException() {
+    public void deactivateAccountWithUnknownMemberThrowNotFoundMemberException() {
         // Given
         String memberId = UUID.randomUUID().toString();
         when(this.memberRepository.findById(memberId)).thenReturn(null);
@@ -286,7 +286,7 @@ class MemberServiceTest {
         // When
         try {
             this.memberService.deactivateAccount(memberId);
-        } catch (UnknownMemberException e) {
+        } catch (NotFoundMemberException e) {
             return;
         }
 

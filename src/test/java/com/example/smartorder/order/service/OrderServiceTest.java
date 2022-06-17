@@ -2,15 +2,17 @@ package com.example.smartorder.order.service;
 
 import com.example.smartorder.item.ItemMock;
 import com.example.smartorder.item.domain.Item;
-import com.example.smartorder.item.exception.UnknownItemException;
+import com.example.smartorder.item.exception.NotFoundItemException;
 import com.example.smartorder.item.repository.ItemRepository;
 import com.example.smartorder.member.MemberMock;
 import com.example.smartorder.member.domain.Member;
-import com.example.smartorder.member.exception.UnknownMemberException;
+import com.example.smartorder.member.exception.NotFoundMemberException;
 import com.example.smartorder.member.repository.MemberRepository;
+import com.example.smartorder.order.OrderMock;
 import com.example.smartorder.order.domain.Order;
 import com.example.smartorder.order.domain.OrderItem;
 import com.example.smartorder.order.exception.IncorrectTotalAmountException;
+import com.example.smartorder.order.exception.NotFoundOrderException;
 import com.example.smartorder.order.repository.OrderRepository;
 import com.example.smartorder.order.service.dto.OrderCommand;
 import com.example.smartorder.order.service.dto.OrderItemCommand;
@@ -29,6 +31,7 @@ class OrderServiceTest {
     private final MemberRepository memberRepository;
     private final ItemRepository itemRepository;
     private final OrderService orderService;
+    private final Member member = new MemberMock().member;
 
     public OrderServiceTest() {
         this.orderRepository = Mockito.mock(OrderRepository.class);
@@ -38,7 +41,7 @@ class OrderServiceTest {
     }
 
     @Test
-    public void putOrderWithUnknownMemberThrowUnknownMemberException() {
+    public void putOrderWithNotFoundMemberThrowNotFoundMemberException() {
         // Given
         String memberId = "unknownMemberId";
         OrderItemCommand orderItem = OrderItemCommand.builder()
@@ -54,7 +57,7 @@ class OrderServiceTest {
         // When
         try {
             this.orderService.putOrder(memberId, order);
-        } catch (UnknownMemberException e) {
+        } catch (NotFoundMemberException e) {
             return;
         }
 
@@ -63,10 +66,9 @@ class OrderServiceTest {
     }
 
     @Test
-    public void putOrderWithWrongItemThrowUnknownItemException() {
+    public void putOrderWithWrongItemThrowNotFoundItemException() {
         // Given
-        Member member = new MemberMock().member;
-        String memberId = member.getId();
+        String memberId = this.member.getId();
         OrderItemCommand orderItem = OrderItemCommand.builder()
                 .itemId("wrongItemId")
                 .quantity(2)
@@ -76,7 +78,7 @@ class OrderServiceTest {
                 .totalAmount((double) 10000)
                 .build();
 
-        when(this.memberRepository.findById(memberId)).thenReturn(member);
+        when(this.memberRepository.findById(memberId)).thenReturn(this.member);
 
         String[] itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).toArray(String[]::new);
         when(this.itemRepository.findByIds(itemIds)).thenReturn(List.of());
@@ -84,7 +86,7 @@ class OrderServiceTest {
         // When
         try {
             this.orderService.putOrder(memberId, order);
-        } catch (UnknownItemException e) {
+        } catch (NotFoundItemException e) {
             return;
         }
 
@@ -95,8 +97,7 @@ class OrderServiceTest {
     @Test
     public void putOrderWithWrongTotalAmountThrowIncorrectTotalAmountException() {
         // Given
-        Member member = new MemberMock().member;
-        String memberId = member.getId();
+        String memberId = this.member.getId();
         Item item = ItemMock.item;
         OrderItemCommand orderItem = OrderItemCommand.builder()
                 .itemId(item.getId())
@@ -107,7 +108,7 @@ class OrderServiceTest {
                 .totalAmount((double) 20000)
                 .build();
 
-        when(this.memberRepository.findById(memberId)).thenReturn(member);
+        when(this.memberRepository.findById(memberId)).thenReturn(this.member);
 
         String[] itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).toArray(String[]::new);
         when(this.itemRepository.findByIds(itemIds)).thenReturn(List.of(item));
@@ -126,8 +127,7 @@ class OrderServiceTest {
     @Test
     public void putOrderWillSucceed() {
         // Given
-        Member member = new MemberMock().member;
-        String memberId = member.getId();
+        String memberId = this.member.getId();
         Item item = ItemMock.item;
         OrderItemCommand orderItem = OrderItemCommand.builder()
                 .itemId(item.getId())
@@ -138,7 +138,7 @@ class OrderServiceTest {
                 .totalAmount((double) 10000)
                 .build();
 
-        when(this.memberRepository.findById(memberId)).thenReturn(member);
+        when(this.memberRepository.findById(memberId)).thenReturn(this.member);
 
         String[] itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).toArray(String[]::new);
         when(this.itemRepository.findByIds(itemIds)).thenReturn(List.of(item));
@@ -157,5 +157,53 @@ class OrderServiceTest {
             });
             assertThat(hasOrderItem).isEqualTo(true);
         }
+    }
+
+    @Test
+    public void getOrderWithWrongOrderIdThrowNotFoundOrderException() {
+        // Given
+        String orderId = "wrongOrderId";
+        when(this.orderRepository.findById(orderId)).thenReturn(null);
+
+        // When
+        try {
+            this.orderService.getOrder(this.member.getId(), orderId);
+        } catch (NotFoundOrderException e) {
+            return;
+        }
+
+        // Then
+        fail();
+    }
+
+    @Test
+    public void getOrderWithWrongMemberIdThrowNotFoundMemberException() {
+        // Given
+        String memberId = "wrongMemberId";
+        Order order = new OrderMock().order;
+        when(this.orderRepository.findById(order.getId())).thenReturn(order);
+
+        // When
+        try {
+            this.orderService.getOrder(memberId, order.getId());
+        } catch (NotFoundMemberException e) {
+            return;
+        }
+
+        // Then
+        fail();
+    }
+
+    @Test
+    public void getOrderWillSucceed() {
+        // Given
+        Order order = new OrderMock().order;
+        when(this.orderRepository.findById(order.getId())).thenReturn(order);
+
+        // When
+        Order foundOrder = this.orderService.getOrder(order.getMember().getId(), order.getId());
+
+        // Then
+        assertThat(foundOrder).isEqualTo(order);
     }
 }
