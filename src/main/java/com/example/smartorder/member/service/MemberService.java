@@ -3,7 +3,7 @@ package com.example.smartorder.member.service;
 import com.example.smartorder.member.domain.Member;
 import com.example.smartorder.member.exception.AlreadyExistingMemberException;
 import com.example.smartorder.member.exception.IncorrectPasswordException;
-import com.example.smartorder.member.exception.UnknownMemberException;
+import com.example.smartorder.member.exception.NotFoundMemberException;
 import com.example.smartorder.member.repository.MemberRepository;
 import com.example.smartorder.member.service.dto.JoinMemberCommand;
 import com.example.smartorder.member.service.dto.LoginMemberCommand;
@@ -35,7 +35,7 @@ public class MemberService {
 
     public Member login(LoginMemberCommand loginMember) {
         Member existingMember = this.memberRepository.findByAccessId(loginMember.getAccessId());
-        if (existingMember == null) throw new UnknownMemberException();
+        if (existingMember == null) throw new NotFoundMemberException();
         if (!this.passwordEncoder.matches(loginMember.getPassword(), existingMember.getPassword())) throw new IncorrectPasswordException();
 
         return existingMember;
@@ -43,7 +43,7 @@ public class MemberService {
 
     public Member getMember(String id) {
         Member member = this.memberRepository.findById(id);
-        if (member == null) throw new UnknownMemberException();
+        if (member == null) throw new NotFoundMemberException();
 
         return member;
     }
@@ -51,7 +51,7 @@ public class MemberService {
     @Transactional
     public void updateProfile(String id, UpdateProfileCommand profile) {
         Member member = this.memberRepository.findById(id);
-        if (member == null) throw new UnknownMemberException();
+        if (member == null) throw new NotFoundMemberException();
 
         member.updateProfile(profile);
     }
@@ -59,7 +59,7 @@ public class MemberService {
     @Transactional
     public void changePassword(String id, String oriPassword, String newPassword) {
         Member member = this.memberRepository.findById(id);
-        if (member == null) throw new UnknownMemberException();
+        if (member == null) throw new NotFoundMemberException();
         if (!this.passwordEncoder.matches(oriPassword, member.getPassword())) throw new IncorrectPasswordException();
 
         member.changePassword(this.passwordEncoder.encode(newPassword));
@@ -68,7 +68,7 @@ public class MemberService {
     @Transactional
     public void deactivateAccount(String id) {
         Member member = this.memberRepository.findById(id);
-        if (member == null) throw new UnknownMemberException();
+        if (member == null) throw new NotFoundMemberException();
 
         member.deactivate();
     }
