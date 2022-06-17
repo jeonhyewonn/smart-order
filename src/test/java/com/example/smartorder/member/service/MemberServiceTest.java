@@ -4,6 +4,9 @@ import com.example.smartorder.member.MemberMock;
 import com.example.smartorder.member.domain.AgeGroup;
 import com.example.smartorder.member.domain.Gender;
 import com.example.smartorder.member.domain.Member;
+import com.example.smartorder.member.exception.AlreadyExistingMemberException;
+import com.example.smartorder.member.exception.IncorrectPasswordException;
+import com.example.smartorder.member.exception.UnknownMemberException;
 import com.example.smartorder.member.repository.MemberRepository;
 import com.example.smartorder.member.service.dto.JoinMemberCommand;
 import com.example.smartorder.member.service.dto.LoginMemberCommand;
@@ -38,7 +41,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void joinWithExistingMemberWillFail() {
+    public void joinWithExistingMemberThrowAlreadyExistingMemberException() {
         // Given
         JoinMemberCommand joinMember = JoinMemberCommand.builder()
                 .accessId("existingId")
@@ -54,7 +57,7 @@ class MemberServiceTest {
         // When
         try {
             this.memberService.join(joinMember);
-        } catch (IllegalStateException e) {
+        } catch (AlreadyExistingMemberException e) {
             return;
         }
 
@@ -84,7 +87,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void loginWithUnknownMemberWillFail() {
+    public void loginWithUnknownMemberThrowUnknownMemberException() {
         // Given
         LoginMemberCommand loginMember = LoginMemberCommand.builder()
                 .accessId("unknownAccessId")
@@ -95,7 +98,7 @@ class MemberServiceTest {
         // When
         try {
             this.memberService.login(loginMember);
-        } catch (IllegalStateException e) {
+        } catch (UnknownMemberException e) {
             return;
         }
 
@@ -104,7 +107,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void loginWithIncorrectPasswordWillFail() {
+    public void loginWithIncorrectPasswordThrowIncorrectPasswordException() {
         // Given
         Member existingMember = this.memberMock.member;
         LoginMemberCommand loginMember = LoginMemberCommand.builder()
@@ -116,7 +119,7 @@ class MemberServiceTest {
         // When
         try {
             this.memberService.login(loginMember);
-        } catch (IllegalStateException e) {
+        } catch (IncorrectPasswordException e) {
             return;
         }
 
@@ -143,7 +146,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void getMemberWithUnknownMemberWillFail() {
+    public void getMemberWithUnknownMemberThrowUnknownMemberException() {
         // Given
         String memberId = UUID.randomUUID().toString();
         when(this.memberRepository.findById(memberId)).thenReturn(null);
@@ -151,7 +154,7 @@ class MemberServiceTest {
         // When
         try {
             this.memberService.getMember(memberId);
-        } catch (IllegalStateException e) {
+        } catch (UnknownMemberException e) {
             return;
         }
 
@@ -174,7 +177,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void updateProfileWithUnknownMemberWillFail() {
+    public void updateProfileWithUnknownMemberThrowUnknownMemberException() {
         // Given
         String memberId = UUID.randomUUID().toString();
         UpdateProfileCommand profile = UpdateProfileCommand
@@ -189,7 +192,7 @@ class MemberServiceTest {
         // When
         try {
             this.memberService.updateProfile(memberId, profile);
-        } catch (IllegalStateException e) {
+        } catch (UnknownMemberException e) {
             return;
         }
 
@@ -219,7 +222,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void changePasswordWithUnknownMemberWillFail() {
+    public void changePasswordWithUnknownMemberThrowUnknownMemberException() {
         // Given
         String memberId = UUID.randomUUID().toString();
         String oriPassword = "oriPassword";
@@ -229,7 +232,7 @@ class MemberServiceTest {
         // When
         try {
             this.memberService.changePassword(memberId, oriPassword, newPassword);
-        } catch (IllegalStateException e) {
+        } catch (UnknownMemberException e) {
             return;
         }
 
@@ -238,7 +241,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void changePasswordWithIncorrectOldPasswordWillFail() {
+    public void changePasswordWithIncorrectOldPasswordThrowIncorrectPasswordException() {
         // Given
         Member existingMember = this.memberMock.member;
         String memberId = existingMember.getId();
@@ -249,7 +252,7 @@ class MemberServiceTest {
         // When
         try {
             this.memberService.changePassword(memberId, oriPassword, newPassword);
-        } catch (IllegalStateException e) {
+        } catch (IncorrectPasswordException e) {
             return;
         }
 
@@ -275,7 +278,7 @@ class MemberServiceTest {
     }
 
     @Test
-    public void deactivateAccountWithUnknownMemberWillFail() {
+    public void deactivateAccountWithUnknownMemberThrowUnknownMemberException() {
         // Given
         String memberId = UUID.randomUUID().toString();
         when(this.memberRepository.findById(memberId)).thenReturn(null);
@@ -283,7 +286,7 @@ class MemberServiceTest {
         // When
         try {
             this.memberService.deactivateAccount(memberId);
-        } catch (IllegalStateException e) {
+        } catch (UnknownMemberException e) {
             return;
         }
 
