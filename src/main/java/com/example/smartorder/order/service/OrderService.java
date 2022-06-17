@@ -53,4 +53,12 @@ public class OrderService {
 
         return order;
     }
+
+    public void cancelOrder(String memberId, String orderId) {
+        Order order = this.orderRepository.findById(orderId);
+        if (order == null) throw new NotFoundOrderException();
+        if (!order.getMember().getId().equals(memberId)) throw new NotFoundMemberException();
+
+        order.cancel();
+    }
 }
