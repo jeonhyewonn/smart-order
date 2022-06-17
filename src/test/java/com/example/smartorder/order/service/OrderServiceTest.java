@@ -206,4 +206,53 @@ class OrderServiceTest {
         // Then
         assertThat(foundOrder).isEqualTo(order);
     }
+
+    @Test
+    public void cancelOrderWithWrongOrderIdThrowNotFoundOrderException() {
+        // Given
+        String orderId = "wrongOrderId";
+        when(this.orderRepository.findById(orderId)).thenReturn(null);
+
+        // When
+        try {
+            this.orderService.cancelOrder(this.member.getId(), orderId);
+        } catch (NotFoundOrderException e) {
+            return;
+        }
+
+        // Then
+        fail();
+    }
+
+    @Test
+    public void cancelOrderWithWrongMemberIdThrowNotFoundMemberException() {
+        // Given
+        String memberId = "wrongMemberId";
+        Order order = new OrderMock().order;
+        when(this.orderRepository.findById(order.getId())).thenReturn(order);
+
+        // When
+        try {
+            this.orderService.cancelOrder(memberId, order.getId());
+        } catch (NotFoundMemberException e) {
+            return;
+        }
+
+        // Then
+        fail();
+    }
+
+    @Test
+    public void cancelOrderWillSucceed() {
+        // Given
+        Order order = new OrderMock().order;
+        when(this.orderRepository.findById(order.getId())).thenReturn(order);
+
+        // When
+        this.orderService.cancelOrder(order.getMember().getId(), order.getId());
+
+        // Then
+        Order canceledOrder = this.orderRepository.findById(order.getId());
+        assertThat(canceledOrder.getIsCanceled()).isEqualTo(true);
+    }
 }
