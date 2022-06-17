@@ -1,6 +1,9 @@
 package com.example.smartorder.member.service;
 
 import com.example.smartorder.member.domain.Member;
+import com.example.smartorder.member.exception.AlreadyExistingMemberException;
+import com.example.smartorder.member.exception.IncorrectPasswordException;
+import com.example.smartorder.member.exception.UnknownMemberException;
 import com.example.smartorder.member.repository.MemberRepository;
 import com.example.smartorder.member.service.dto.JoinMemberCommand;
 import com.example.smartorder.member.service.dto.LoginMemberCommand;
@@ -22,7 +25,7 @@ public class MemberService {
     @Transactional
     public Member join(JoinMemberCommand joinMember) {
         Member existingMember = this.memberRepository.findByAccessId(joinMember.getAccessId());
-        if (existingMember != null) throw new IllegalStateException("ExistingMember");
+        if (existingMember != null) throw new AlreadyExistingMemberException();
 
         Member newMember = Member.createBy(joinMember, this.passwordEncoder.encode(joinMember.getPassword()));
         this.memberRepository.save(newMember);
@@ -32,15 +35,15 @@ public class MemberService {
 
     public Member login(LoginMemberCommand loginMember) {
         Member existingMember = this.memberRepository.findByAccessId(loginMember.getAccessId());
-        if (existingMember == null) throw new IllegalStateException("UnknownMember");
-        if (!this.passwordEncoder.matches(loginMember.getPassword(), existingMember.getPassword())) throw new IllegalStateException("IncorrectPassword");
+        if (existingMember == null) throw new UnknownMemberException();
+        if (!this.passwordEncoder.matches(loginMember.getPassword(), existingMember.getPassword())) throw new IncorrectPasswordException();
 
         return existingMember;
     }
 
     public Member getMember(String id) {
         Member member = this.memberRepository.findById(id);
-        if (member == null) throw new IllegalStateException("UnknownMember");
+        if (member == null) throw new UnknownMemberException();
 
         return member;
     }
@@ -48,7 +51,7 @@ public class MemberService {
     @Transactional
     public void updateProfile(String id, UpdateProfileCommand profile) {
         Member member = this.memberRepository.findById(id);
-        if (member == null) throw new IllegalStateException("UnknownMember");
+        if (member == null) throw new UnknownMemberException();
 
         member.updateProfile(profile);
     }
@@ -56,8 +59,8 @@ public class MemberService {
     @Transactional
     public void changePassword(String id, String oriPassword, String newPassword) {
         Member member = this.memberRepository.findById(id);
-        if (member == null) throw new IllegalStateException("UnknownMember");
-        if (!this.passwordEncoder.matches(oriPassword, member.getPassword())) throw new IllegalStateException("IncorrectPassword");
+        if (member == null) throw new UnknownMemberException();
+        if (!this.passwordEncoder.matches(oriPassword, member.getPassword())) throw new IncorrectPasswordException();
 
         member.changePassword(this.passwordEncoder.encode(newPassword));
     }
@@ -65,7 +68,7 @@ public class MemberService {
     @Transactional
     public void deactivateAccount(String id) {
         Member member = this.memberRepository.findById(id);
-        if (member == null) throw new IllegalStateException("UnknownMember");
+        if (member == null) throw new UnknownMemberException();
 
         member.deactivate();
     }
