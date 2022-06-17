@@ -1,17 +1,19 @@
 package com.example.smartorder.order.domain;
 
 import com.example.smartorder.item.domain.Item;
+import com.example.smartorder.order.service.dto.OrderItemCommand;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "order_items")
-@Getter
+@Getter @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem {
     @Id
@@ -31,5 +33,14 @@ public class OrderItem {
     private Integer quantity;
 
     private Boolean isDeleted;
-    private LocalDateTime createdAt;
+
+    public static OrderItem createBy(OrderItemCommand newOrderItem, Item item) {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setId(UUID.randomUUID().toString());
+        orderItem.setItem(item);
+        orderItem.setQuantity(newOrderItem.getQuantity());
+        orderItem.setIsDeleted(false);
+
+        return orderItem;
+    }
 }

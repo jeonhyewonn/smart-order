@@ -17,4 +17,11 @@ public class ItemRepository {
                 .setParameter("isDeleted", false)
                 .getResultList();
     }
+
+    public List<Item> findByIds(String[] ids) {
+        return this.em.createQuery("SELECT i FROM Item i WHERE i.isDeleted = :isDeleted AND i.id IN :ids", Item.class)
+                .setParameter("isDeleted", false)
+                .setParameter(":ids", ids)
+                .getResultList();
+    }
 }

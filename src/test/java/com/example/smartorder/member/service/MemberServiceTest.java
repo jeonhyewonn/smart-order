@@ -10,10 +10,7 @@ import com.example.smartorder.member.service.dto.LoginMemberCommand;
 import com.example.smartorder.member.service.dto.UpdateProfileCommand;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -23,8 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
