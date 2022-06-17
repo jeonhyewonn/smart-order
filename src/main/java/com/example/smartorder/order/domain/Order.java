@@ -58,4 +58,8 @@ public class Order {
 
         return order;
     }
+
+    public void cancel() {
+        this.setIsCanceled(true);
+    }
 }
