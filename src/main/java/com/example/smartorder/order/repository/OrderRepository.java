@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Repository
@@ -16,7 +17,10 @@ public class OrderRepository {
     public void save(Order order) { this.em.persist(order); }
 
     public Order findById(String id) {
-        Order order = this.findOrderByOrderId(id);
+        Optional<Order> result = this.findOrderByOrderId(id);
+        if (result.isEmpty()) return null;
+
+        Order order = result.get();
 
         order.getOrderItems().clear();
         for (OrderItem orderItem : this.findOrderItemsByOrderId(order.getId())) {
@@ -26,7 +30,7 @@ public class OrderRepository {
         return order;
     }
 
-    private Order findOrderByOrderId(String orderId) {
+    private Optional<Order> findOrderByOrderId(String orderId) {
         return this.em.createQuery(
                         "SELECT distinct o " +
                                 "FROM Order o " +
@@ -35,7 +39,8 @@ public class OrderRepository {
                         Order.class
                 )
                 .setParameter("id", orderId)
-                .getSingleResult();
+                .getResultStream()
+                .findFirst();
     }
 
     private List<OrderItem> findOrderItemsByOrderId(String orderId) {
