@@ -3,7 +3,6 @@ package com.example.smartorder.order.domain;
 import com.example.smartorder.item.domain.Item;
 import com.example.smartorder.member.domain.Member;
 import com.example.smartorder.order.service.dto.OrderCommand;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,10 +21,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order {
     @Id
-    @GeneratedValue
     private String id;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -38,23 +35,30 @@ public class Order {
     private Boolean isCanceled;
     private LocalDateTime createdAt;
 
-    public static Order createBy(OrderCommand newOrder, Member member, List<Item> items) {
-        HashMap<String, Item> itemMap = new HashMap<>();
-        for(Item item : items) {
-            itemMap.put(item.getId(), item);
-        }
-        List<OrderItem> orderItems = newOrder.getOrderItemCommands().stream()
-                .map(cmd -> OrderItem.createBy(cmd, itemMap.get(cmd.getItemId())))
-                .collect(Collectors.toList());
+    private void setMember(Member member) {
+        this.member = member;
+        member.getOrders().add(this);
+    }
 
+    public static Order createBy(OrderCommand newOrder, Member member, List<Item> items) {
         Order order = new Order();
         order.setId(UUID.randomUUID().toString());
         order.setMember(member);
-        order.setOrderItems(orderItems);
         order.setTotalAmount(newOrder.getTotalAmount());
         order.setState(OrderState.ACCEPTED);
         order.setIsCanceled(false);
         order.setCreatedAt(LocalDateTime.now());
+
+        HashMap<String, Item> itemMap = new HashMap<>();
+        for(Item item : items) {
+            itemMap.put(item.getId(), item);
+        }
+
+        List<OrderItem> orderItems = newOrder.getOrderItemCommands().stream()
+                .map(cmd -> OrderItem.createBy(cmd, order, itemMap.get(cmd.getItemId())))
+                .collect(Collectors.toList());
+
+        order.setOrderItems(orderItems);
 
         return order;
     }

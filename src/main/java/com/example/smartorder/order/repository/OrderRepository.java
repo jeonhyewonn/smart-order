@@ -1,10 +1,12 @@
 package com.example.smartorder.order.repository;
 
 import com.example.smartorder.order.domain.Order;
+import com.example.smartorder.order.domain.OrderItem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Repository
@@ -13,5 +15,38 @@ public class OrderRepository {
 
     public void save(Order order) { this.em.persist(order); }
 
-    public Order findById(String id) { return this.em.find(Order.class, id); }
+    public Order findById(String id) {
+        Order order = this.findOrderByOrderId(id);
+
+        order.getOrderItems().clear();
+        for (OrderItem orderItem : this.findOrderItemsByOrderId(order.getId())) {
+            order.getOrderItems().add(orderItem);
+        }
+
+        return order;
+    }
+
+    private Order findOrderByOrderId(String orderId) {
+        return this.em.createQuery(
+                        "SELECT distinct o " +
+                                "FROM Order o " +
+                                "JOIN FETCH o.member m " +
+                                "WHERE o.id = :id",
+                        Order.class
+                )
+                .setParameter("id", orderId)
+                .getSingleResult();
+    }
+
+    private List<OrderItem> findOrderItemsByOrderId(String orderId) {
+        return this.em.createQuery(
+                "SELECT oi " +
+                        "FROM OrderItem oi " +
+                        "JOIN FETCH oi.item i " +
+                        "WHERE oi.order.id = :orderId",
+                OrderItem.class
+        )
+                .setParameter("orderId", orderId)
+                .getResultList();
+    }
 }
