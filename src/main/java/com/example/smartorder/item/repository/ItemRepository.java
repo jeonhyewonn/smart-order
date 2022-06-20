@@ -18,10 +18,10 @@ public class ItemRepository {
                 .getResultList();
     }
 
-    public List<Item> findByIds(String[] ids) {
+    public List<Item> findByIds(List<String> ids) {
         return this.em.createQuery("SELECT i FROM Item i WHERE i.isDeleted = :isDeleted AND i.id IN :ids", Item.class)
                 .setParameter("isDeleted", false)
-                .setParameter(":ids", ids)
+                .setParameter("ids", ids)
                 .getResultList();
     }
 }

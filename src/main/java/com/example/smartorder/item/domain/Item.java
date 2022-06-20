@@ -23,9 +23,9 @@ public class Item {
     private Boolean isDeleted;
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "item")
     private List<ItemIngredient> itemIngredients;
 
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "item")
     private List<OrderItem> orderItems;
 }
