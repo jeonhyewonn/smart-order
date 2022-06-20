@@ -2,7 +2,6 @@ package com.example.smartorder.order.domain;
 
 import com.example.smartorder.item.domain.Item;
 import com.example.smartorder.order.service.dto.OrderItemCommand;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,15 +16,12 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem {
     @Id
-    @GeneratedValue
     private String id;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item;
@@ -34,9 +30,10 @@ public class OrderItem {
 
     private Boolean isDeleted;
 
-    public static OrderItem createBy(OrderItemCommand newOrderItem, Item item) {
+    public static OrderItem createBy(OrderItemCommand newOrderItem, Order order, Item item) {
         OrderItem orderItem = new OrderItem();
         orderItem.setId(UUID.randomUUID().toString());
+        orderItem.setOrder(order);
         orderItem.setItem(item);
         orderItem.setQuantity(newOrderItem.getQuantity());
         orderItem.setIsDeleted(false);

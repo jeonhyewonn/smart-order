@@ -22,6 +22,7 @@ import org.mockito.Mockito;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -80,7 +81,7 @@ class OrderServiceTest {
 
         when(this.memberRepository.findById(memberId)).thenReturn(this.member);
 
-        String[] itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).toArray(String[]::new);
+        List<String> itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).collect(toList());
         when(this.itemRepository.findByIds(itemIds)).thenReturn(List.of());
 
         // When
@@ -110,7 +111,7 @@ class OrderServiceTest {
 
         when(this.memberRepository.findById(memberId)).thenReturn(this.member);
 
-        String[] itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).toArray(String[]::new);
+        List<String> itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).collect(toList());
         when(this.itemRepository.findByIds(itemIds)).thenReturn(List.of(item));
 
         // When
@@ -140,7 +141,7 @@ class OrderServiceTest {
 
         when(this.memberRepository.findById(memberId)).thenReturn(this.member);
 
-        String[] itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).toArray(String[]::new);
+        List<String> itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).collect(toList());
         when(this.itemRepository.findByIds(itemIds)).thenReturn(List.of(item));
 
         // When

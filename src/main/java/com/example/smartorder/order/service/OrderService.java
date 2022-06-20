@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
@@ -34,9 +36,9 @@ public class OrderService {
         Member member = this.memberRepository.findById(memberId);
         if (member == null) throw new NotFoundMemberException();
 
-        String[] itemIds = newOrder.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).toArray(String[]::new);
+        List<String> itemIds = newOrder.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).collect(toList());
         List<Item> items = this.itemRepository.findByIds(itemIds);
-        if (items.size() != itemIds.length) throw new NotFoundItemException();
+        if (items.size() != itemIds.size()) throw new NotFoundItemException();
 
         if (!newOrder.isTotalAmountCorrect(items)) throw new IncorrectTotalAmountException();
 
@@ -54,6 +56,7 @@ public class OrderService {
         return order;
     }
 
+    @Transactional
     public void cancelOrder(String memberId, String orderId) {
         Order order = this.orderRepository.findById(orderId);
         if (order == null) throw new NotFoundOrderException();
