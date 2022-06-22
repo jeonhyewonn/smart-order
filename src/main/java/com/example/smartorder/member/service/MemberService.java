@@ -27,7 +27,7 @@ public class MemberService {
         Member existingMember = this.memberRepository.findByAccessId(joinMember.getAccessId());
         if (existingMember != null) throw new AlreadyExistingMemberException();
 
-        Member newMember = Member.createBy(joinMember, this.passwordEncoder.encode(joinMember.getPassword()));
+        Member newMember = Member.createBy(joinMember, this.passwordEncoder);
         this.memberRepository.save(newMember);
 
         return newMember;
@@ -36,7 +36,7 @@ public class MemberService {
     public Member login(LoginMemberCommand loginMember) {
         Member existingMember = this.memberRepository.findByAccessId(loginMember.getAccessId());
         if (existingMember == null) throw new NotFoundMemberException();
-        if (!this.passwordEncoder.matches(loginMember.getPassword(), existingMember.getPassword())) throw new IncorrectPasswordException();
+        if (!existingMember.getPassword().isMatchedWith(loginMember.getPassword(), this.passwordEncoder)) throw new IncorrectPasswordException();
 
         return existingMember;
     }
@@ -50,25 +50,22 @@ public class MemberService {
 
     @Transactional
     public void updateProfile(String id, UpdateProfileCommand profile) {
-        Member member = this.memberRepository.findById(id);
-        if (member == null) throw new NotFoundMemberException();
+        Member member = this.getMember(id);
 
         member.updateProfile(profile);
     }
 
     @Transactional
     public void changePassword(String id, String oriPassword, String newPassword) {
-        Member member = this.memberRepository.findById(id);
-        if (member == null) throw new NotFoundMemberException();
-        if (!this.passwordEncoder.matches(oriPassword, member.getPassword())) throw new IncorrectPasswordException();
+        Member member = this.getMember(id);
+        if (!member.getPassword().isMatchedWith(oriPassword, this.passwordEncoder)) throw new IncorrectPasswordException();
 
-        member.changePassword(this.passwordEncoder.encode(newPassword));
+        member.changePassword(newPassword, this.passwordEncoder);
     }
 
     @Transactional
     public void deactivateAccount(String id) {
-        Member member = this.memberRepository.findById(id);
-        if (member == null) throw new NotFoundMemberException();
+        Member member = this.getMember(id);
 
         member.deactivate();
     }

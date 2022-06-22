@@ -51,7 +51,7 @@ class MemberServiceTest {
                 .gender(Gender.WOMEN)
                 .tel("01012345678")
                 .build();
-        Member existingMember = Member.createBy(joinMember, this.passwordEncoder.encode(joinMember.getPassword()));
+        Member existingMember = Member.createBy(joinMember, this.passwordEncoder);
         when(this.memberRepository.findByAccessId(joinMember.getAccessId())).thenReturn(existingMember);
 
         // When
@@ -274,7 +274,7 @@ class MemberServiceTest {
 
         // Then
         Member updatedMember = this.memberRepository.findById(memberId);
-        assertThat(this.passwordEncoder.matches(newPassword, updatedMember.getPassword())).isEqualTo(true);
+        assertThat(updatedMember.getPassword().isMatchedWith(newPassword, this.passwordEncoder)).isEqualTo(true);
     }
 
     @Test
