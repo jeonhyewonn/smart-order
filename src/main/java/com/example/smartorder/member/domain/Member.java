@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -24,7 +25,8 @@ public class Member {
 
     private String accessId;
 
-    private String password;
+    @Embedded
+    private Password password;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -46,11 +48,11 @@ public class Member {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Order> orders = new ArrayList<>();
 
-    public static Member createBy(JoinMemberCommand newMember, String encodedPassword) {
+    public static Member createBy(JoinMemberCommand newMember, PasswordEncoder passwordEncoder) {
         Member member = new Member();
         member.setId(UUID.randomUUID().toString());
         member.setAccessId(newMember.getAccessId());
-        member.setPassword(encodedPassword);
+        member.setPassword(Password.createBy(newMember.getPassword(), passwordEncoder));
         member.setRole(Role.CLIENT);
         member.setName(newMember.getName());
         member.setAgeGroup(newMember.getAgeGroup());
@@ -69,8 +71,8 @@ public class Member {
         if (profile.getTel() != null) this.setTel(profile.getTel());
     }
 
-    public void changePassword(String password) {
-        this.setPassword(password);
+    public void changePassword(String password, PasswordEncoder passwordEncoder) {
+        this.setPassword(Password.createBy(password, passwordEncoder));
     }
 
     public void deactivate() {

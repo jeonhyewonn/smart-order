@@ -19,6 +19,6 @@ public class MemberMock {
             .build();
     public final Member member = Member.createBy(
             this.joinMemberCmd,
-            PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(this.joinMemberCmd.getPassword())
+            PasswordEncoderFactories.createDelegatingPasswordEncoder()
     );
 }
