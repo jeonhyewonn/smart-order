@@ -24,7 +24,7 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 class OrderServiceTest {
@@ -55,15 +55,10 @@ class OrderServiceTest {
                 .build();
         when(this.memberRepository.findById(memberId)).thenReturn(null);
 
-        // When
-        try {
-            this.orderService.putOrder(memberId, order);
-        } catch (NotFoundMemberException e) {
-            return;
-        }
-
         // Then
-        fail();
+        assertThatThrownBy(() -> {
+            this.orderService.putOrder(memberId, order);
+        }).isInstanceOf(NotFoundMemberException.class);
     }
 
     @Test
@@ -84,15 +79,10 @@ class OrderServiceTest {
         List<String> itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).collect(toList());
         when(this.itemRepository.findByIds(itemIds)).thenReturn(List.of());
 
-        // When
-        try {
-            this.orderService.putOrder(memberId, order);
-        } catch (NotFoundItemException e) {
-            return;
-        }
-
         // Then
-        fail();
+        assertThatThrownBy(() -> {
+            this.orderService.putOrder(memberId, order);
+        }).isInstanceOf(NotFoundItemException.class);
     }
 
     @Test
@@ -114,15 +104,10 @@ class OrderServiceTest {
         List<String> itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).collect(toList());
         when(this.itemRepository.findByIds(itemIds)).thenReturn(List.of(item));
 
-        // When
-        try {
-            this.orderService.putOrder(memberId, order);
-        } catch (IncorrectTotalAmountException e) {
-            return;
-        }
-
         // Then
-        fail();
+        assertThatThrownBy(() -> {
+            this.orderService.putOrder(memberId, order);
+        }).isInstanceOf(IncorrectTotalAmountException.class);
     }
 
     @Test
@@ -166,15 +151,10 @@ class OrderServiceTest {
         String orderId = "wrongOrderId";
         when(this.orderRepository.findById(orderId)).thenReturn(null);
 
-        // When
-        try {
-            this.orderService.getOrder(this.member.getId(), orderId);
-        } catch (NotFoundOrderException e) {
-            return;
-        }
-
         // Then
-        fail();
+        assertThatThrownBy(() -> {
+            this.orderService.getOrder(this.member.getId(), orderId);
+        }).isInstanceOf(NotFoundOrderException.class);
     }
 
     @Test
@@ -184,15 +164,10 @@ class OrderServiceTest {
         Order order = new OrderMock().order;
         when(this.orderRepository.findById(order.getId())).thenReturn(order);
 
-        // When
-        try {
-            this.orderService.getOrder(memberId, order.getId());
-        } catch (NotFoundMemberException e) {
-            return;
-        }
-
         // Then
-        fail();
+        assertThatThrownBy(() -> {
+            this.orderService.getOrder(memberId, order.getId());
+        }).isInstanceOf(NotFoundMemberException.class);
     }
 
     @Test
@@ -214,15 +189,10 @@ class OrderServiceTest {
         String orderId = "wrongOrderId";
         when(this.orderRepository.findById(orderId)).thenReturn(null);
 
-        // When
-        try {
-            this.orderService.cancelOrder(this.member.getId(), orderId);
-        } catch (NotFoundOrderException e) {
-            return;
-        }
-
         // Then
-        fail();
+        assertThatThrownBy(() -> {
+            this.orderService.cancelOrder(this.member.getId(), orderId);
+        }).isInstanceOf(NotFoundOrderException.class);
     }
 
     @Test
@@ -232,15 +202,10 @@ class OrderServiceTest {
         Order order = new OrderMock().order;
         when(this.orderRepository.findById(order.getId())).thenReturn(order);
 
-        // When
-        try {
-            this.orderService.cancelOrder(memberId, order.getId());
-        } catch (NotFoundMemberException e) {
-            return;
-        }
-
         // Then
-        fail();
+        assertThatThrownBy(() -> {
+            this.orderService.cancelOrder(memberId, order.getId());
+        }).isInstanceOf(NotFoundMemberException.class);
     }
 
     @Test

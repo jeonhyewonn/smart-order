@@ -1,3 +1,5 @@
 package com.example.smartorder.member.exception;
 
-public class AlreadyExistingMemberException extends RuntimeException {}
+import com.example.smartorder.exception.CustomException;
+
+public class AlreadyExistingMemberException extends CustomException {}

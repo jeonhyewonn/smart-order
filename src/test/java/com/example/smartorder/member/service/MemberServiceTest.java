@@ -20,7 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 class MemberServiceTest {
@@ -54,15 +54,10 @@ class MemberServiceTest {
         Member existingMember = Member.createBy(joinMember, this.passwordEncoder);
         when(this.memberRepository.findByAccessId(joinMember.getAccessId())).thenReturn(existingMember);
 
-        // When
-        try {
-            this.memberService.join(joinMember);
-        } catch (AlreadyExistingMemberException e) {
-            return;
-        }
-
         // Then
-        fail();
+        assertThatThrownBy(() -> {
+            this.memberService.join(joinMember);
+        }).isInstanceOf(AlreadyExistingMemberException.class);
     }
 
     @Test
@@ -95,15 +90,10 @@ class MemberServiceTest {
                 .build();
         when(this.memberRepository.findByAccessId(loginMember.getAccessId())).thenReturn(null);
 
-        // When
-        try {
-            this.memberService.login(loginMember);
-        } catch (NotFoundMemberException e) {
-            return;
-        }
-
         // Then
-        fail();
+        assertThatThrownBy(() -> {
+            this.memberService.login(loginMember);
+        }).isInstanceOf(NotFoundMemberException.class);
     }
 
     @Test
@@ -116,15 +106,10 @@ class MemberServiceTest {
                 .build();
         when(this.memberRepository.findByAccessId(loginMember.getAccessId())).thenReturn(existingMember);
 
-        // When
-        try {
-            this.memberService.login(loginMember);
-        } catch (IncorrectPasswordException e) {
-            return;
-        }
-
         // Then
-        fail();
+        assertThatThrownBy(() -> {
+            this.memberService.login(loginMember);
+        }).isInstanceOf(IncorrectPasswordException.class);
     }
 
     @Test
@@ -151,15 +136,10 @@ class MemberServiceTest {
         String memberId = UUID.randomUUID().toString();
         when(this.memberRepository.findById(memberId)).thenReturn(null);
 
-        // When
-        try {
-            this.memberService.getMember(memberId);
-        } catch (NotFoundMemberException e) {
-            return;
-        }
-
         // Then
-        fail();
+        assertThatThrownBy(() -> {
+            this.memberService.getMember(memberId);
+        }).isInstanceOf(NotFoundMemberException.class);
     }
 
     @Test
@@ -189,15 +169,10 @@ class MemberServiceTest {
                 .build();
         when(this.memberRepository.findById(memberId)).thenReturn(null);
 
-        // When
-        try {
-            this.memberService.updateProfile(memberId, profile);
-        } catch (NotFoundMemberException e) {
-            return;
-        }
-
         // Then
-        fail();
+        assertThatThrownBy(() -> {
+            this.memberService.updateProfile(memberId, profile);
+        }).isInstanceOf(NotFoundMemberException.class);
     }
 
     @Test
@@ -229,15 +204,10 @@ class MemberServiceTest {
         String newPassword = "newPassword";
         when(this.memberRepository.findById(memberId)).thenReturn(null);
 
-        // When
-        try {
-            this.memberService.changePassword(memberId, oriPassword, newPassword);
-        } catch (NotFoundMemberException e) {
-            return;
-        }
-
         // Then
-        fail();
+        assertThatThrownBy(() -> {
+            this.memberService.changePassword(memberId, oriPassword, newPassword);
+        }).isInstanceOf(NotFoundMemberException.class);
     }
 
     @Test
@@ -249,15 +219,10 @@ class MemberServiceTest {
         String newPassword = "newPassword";
         when(this.memberRepository.findById(memberId)).thenReturn(existingMember);
 
-        // When
-        try {
-            this.memberService.changePassword(memberId, oriPassword, newPassword);
-        } catch (IncorrectPasswordException e) {
-            return;
-        }
-
         // Then
-        fail();
+        assertThatThrownBy(() -> {
+            this.memberService.changePassword(memberId, oriPassword, newPassword);
+        }).isInstanceOf(IncorrectPasswordException.class);
     }
 
     @Test
@@ -283,15 +248,10 @@ class MemberServiceTest {
         String memberId = UUID.randomUUID().toString();
         when(this.memberRepository.findById(memberId)).thenReturn(null);
 
-        // When
-        try {
-            this.memberService.deactivateAccount(memberId);
-        } catch (NotFoundMemberException e) {
-            return;
-        }
-
         // Then
-        fail();
+        assertThatThrownBy(() -> {
+            this.memberService.deactivateAccount(memberId);
+        }).isInstanceOf(NotFoundMemberException.class);
     }
 
     @Test
