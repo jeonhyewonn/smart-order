@@ -1,3 +1,5 @@
 package com.example.smartorder.item.exception;
 
-public class NotFoundItemException extends RuntimeException {}
+import com.example.smartorder.exception.NotFoundResourceException;
+
+public class NotFoundItemException extends NotFoundResourceException {}

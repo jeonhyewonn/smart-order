@@ -1,3 +1,5 @@
 package com.example.smartorder.order.exception;
 
-public class IncorrectTotalAmountException extends RuntimeException {}
+import com.example.smartorder.exception.IncorrectException;
+
+public class IncorrectTotalAmountException extends IncorrectException {}
