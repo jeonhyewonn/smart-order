@@ -1,5 +1,6 @@
 package com.example.smartorder.item.domain;
 
+import com.example.smartorder.entity.AuditingEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,7 @@ import java.util.List;
 @Table(name = "ingredients")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Ingredient {
+public class Ingredient extends AuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -1,5 +1,6 @@
 package com.example.smartorder.item.domain;
 
+import com.example.smartorder.entity.AuditingEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "item_ingredients")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ItemIngredient {
+public class ItemIngredient extends AuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

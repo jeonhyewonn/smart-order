@@ -1,5 +1,6 @@
 package com.example.smartorder.member.domain;
 
+import com.example.smartorder.entity.AuditingEntity;
 import com.example.smartorder.order.domain.Order;
 import com.example.smartorder.member.service.dto.JoinMemberCommand;
 import com.example.smartorder.member.service.dto.UpdateProfileCommand;
@@ -10,16 +11,14 @@ import lombok.Setter;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "members")
 @Getter @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Member extends AuditingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -44,8 +43,6 @@ public class Member {
 
     private Boolean isDeleted;
 
-    private LocalDateTime createdAt;
-
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Order> orders = new ArrayList<>();
 
@@ -59,7 +56,6 @@ public class Member {
         member.setGender(newMember.getGender());
         member.setTel(newMember.getTel());
         member.setIsDeleted(false);
-        member.setCreatedAt(LocalDateTime.now());
 
         return member;
     }
