@@ -1,3 +1,5 @@
 package com.example.smartorder.member.exception;
 
-public class IncorrectPasswordException extends RuntimeException {}
+import com.example.smartorder.exception.IncorrectException;
+
+public class IncorrectPasswordException extends IncorrectException {}

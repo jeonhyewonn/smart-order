@@ -1,3 +1,5 @@
 package com.example.smartorder.member.exception;
 
-public class NotFoundMemberException extends RuntimeException {}
+import com.example.smartorder.exception.NotFoundResourceException;
+
+public class NotFoundMemberException extends NotFoundResourceException {}
