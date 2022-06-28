@@ -21,6 +21,7 @@ import org.mockito.Mockito;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +45,7 @@ class OrderServiceTest {
     @Test
     public void putOrderWithNotFoundMemberThrowNotFoundMemberException() {
         // Given
-        String memberId = "unknownMemberId";
+        Long memberId = 0L;
         OrderItemCommand orderItem = OrderItemCommand.builder()
                 .itemId(ItemMock.item.getId())
                 .quantity(2)
@@ -53,7 +54,7 @@ class OrderServiceTest {
                 .orderItemCommands(Arrays.asList(orderItem))
                 .totalAmount((double) 10000)
                 .build();
-        when(this.memberRepository.findById(memberId)).thenReturn(null);
+        when(this.memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
         // Then
         assertThatThrownBy(() -> {
@@ -64,9 +65,9 @@ class OrderServiceTest {
     @Test
     public void putOrderWithWrongItemThrowNotFoundItemException() {
         // Given
-        String memberId = this.member.getId();
+        Long memberId = this.member.getId();
         OrderItemCommand orderItem = OrderItemCommand.builder()
-                .itemId("wrongItemId")
+                .itemId(0L)
                 .quantity(2)
                 .build();
         OrderCommand order = OrderCommand.builder()
@@ -74,9 +75,9 @@ class OrderServiceTest {
                 .totalAmount((double) 10000)
                 .build();
 
-        when(this.memberRepository.findById(memberId)).thenReturn(this.member);
+        when(this.memberRepository.findById(memberId)).thenReturn(Optional.of(this.member));
 
-        List<String> itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).collect(toList());
+        List<Long> itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).collect(toList());
         when(this.itemRepository.findByIds(itemIds)).thenReturn(List.of());
 
         // Then
@@ -88,7 +89,7 @@ class OrderServiceTest {
     @Test
     public void putOrderWithWrongTotalAmountThrowIncorrectTotalAmountException() {
         // Given
-        String memberId = this.member.getId();
+        Long memberId = this.member.getId();
         Item item = ItemMock.item;
         OrderItemCommand orderItem = OrderItemCommand.builder()
                 .itemId(item.getId())
@@ -99,9 +100,9 @@ class OrderServiceTest {
                 .totalAmount((double) 20000)
                 .build();
 
-        when(this.memberRepository.findById(memberId)).thenReturn(this.member);
+        when(this.memberRepository.findById(memberId)).thenReturn(Optional.of(this.member));
 
-        List<String> itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).collect(toList());
+        List<Long> itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).collect(toList());
         when(this.itemRepository.findByIds(itemIds)).thenReturn(List.of(item));
 
         // Then
@@ -113,7 +114,7 @@ class OrderServiceTest {
     @Test
     public void putOrderWillSucceed() {
         // Given
-        String memberId = this.member.getId();
+        Long memberId = this.member.getId();
         Item item = ItemMock.item;
         OrderItemCommand orderItem = OrderItemCommand.builder()
                 .itemId(item.getId())
@@ -124,9 +125,9 @@ class OrderServiceTest {
                 .totalAmount((double) 10000)
                 .build();
 
-        when(this.memberRepository.findById(memberId)).thenReturn(this.member);
+        when(this.memberRepository.findById(memberId)).thenReturn(Optional.of(this.member));
 
-        List<String> itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).collect(toList());
+        List<Long> itemIds = order.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).collect(toList());
         when(this.itemRepository.findByIds(itemIds)).thenReturn(List.of(item));
 
         // When
@@ -148,8 +149,8 @@ class OrderServiceTest {
     @Test
     public void getOrderWithWrongOrderIdThrowNotFoundOrderException() {
         // Given
-        String orderId = "wrongOrderId";
-        when(this.orderRepository.findById(orderId)).thenReturn(null);
+        Long orderId = 0L;
+        when(this.orderRepository.findById(orderId)).thenReturn(Optional.empty());
 
         // Then
         assertThatThrownBy(() -> {
@@ -160,9 +161,9 @@ class OrderServiceTest {
     @Test
     public void getOrderWithWrongMemberIdThrowNotFoundMemberException() {
         // Given
-        String memberId = "wrongMemberId";
+        Long memberId = 0L;
         Order order = new OrderMock().order;
-        when(this.orderRepository.findById(order.getId())).thenReturn(order);
+        when(this.orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
 
         // Then
         assertThatThrownBy(() -> {
@@ -174,7 +175,7 @@ class OrderServiceTest {
     public void getOrderWillSucceed() {
         // Given
         Order order = new OrderMock().order;
-        when(this.orderRepository.findById(order.getId())).thenReturn(order);
+        when(this.orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
 
         // When
         Order foundOrder = this.orderService.getOrder(order.getMember().getId(), order.getId());
@@ -186,8 +187,8 @@ class OrderServiceTest {
     @Test
     public void cancelOrderWithWrongOrderIdThrowNotFoundOrderException() {
         // Given
-        String orderId = "wrongOrderId";
-        when(this.orderRepository.findById(orderId)).thenReturn(null);
+        Long orderId = 0L;
+        when(this.orderRepository.findById(orderId)).thenReturn(Optional.empty());
 
         // Then
         assertThatThrownBy(() -> {
@@ -198,9 +199,9 @@ class OrderServiceTest {
     @Test
     public void cancelOrderWithWrongMemberIdThrowNotFoundMemberException() {
         // Given
-        String memberId = "wrongMemberId";
+        Long memberId = 0L;
         Order order = new OrderMock().order;
-        when(this.orderRepository.findById(order.getId())).thenReturn(order);
+        when(this.orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
 
         // Then
         assertThatThrownBy(() -> {
@@ -212,13 +213,13 @@ class OrderServiceTest {
     public void cancelOrderWillSucceed() {
         // Given
         Order order = new OrderMock().order;
-        when(this.orderRepository.findById(order.getId())).thenReturn(order);
+        when(this.orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
 
         // When
         this.orderService.cancelOrder(order.getMember().getId(), order.getId());
 
         // Then
-        Order canceledOrder = this.orderRepository.findById(order.getId());
-        assertThat(canceledOrder.getIsCanceled()).isEqualTo(true);
+        Order canceledOrder = this.orderRepository.findById(order.getId()).get();
+        assertThat(canceledOrder.getIsCanceled()).isTrue();
     }
 }
