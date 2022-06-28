@@ -11,7 +11,7 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class Accessor implements UserDetails {
     private final String roleName;
-    private final String id;
+    private final String subject;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -27,7 +27,11 @@ public class Accessor implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.id;
+        return this.subject;
+    }
+
+    public Long getId() {
+        return Long.valueOf(this.subject);
     }
 
     @Override

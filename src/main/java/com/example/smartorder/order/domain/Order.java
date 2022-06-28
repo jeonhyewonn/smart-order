@@ -12,7 +12,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Entity
@@ -20,8 +19,8 @@ import java.util.stream.Collectors;
 @Getter @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order {
-    @Id
-    private String id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -42,14 +41,13 @@ public class Order {
 
     public static Order createBy(OrderCommand newOrder, Member member, List<Item> items) {
         Order order = new Order();
-        order.setId(UUID.randomUUID().toString());
         order.setMember(member);
         order.setTotalAmount(newOrder.getTotalAmount());
         order.setState(OrderState.ACCEPTED);
         order.setIsCanceled(false);
         order.setCreatedAt(LocalDateTime.now());
 
-        HashMap<String, Item> itemMap = new HashMap<>();
+        HashMap<Long, Item> itemMap = new HashMap<>();
         for(Item item : items) {
             itemMap.put(item.getId(), item);
         }

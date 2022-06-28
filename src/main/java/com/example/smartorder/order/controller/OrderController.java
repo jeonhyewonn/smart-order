@@ -24,7 +24,7 @@ public class OrderController {
 
     @PostMapping()
     public OrderIdResponse putOrder(Authentication authentication, @RequestBody @Valid OrderRequest request) {
-        String memberId = ((Accessor) authentication.getPrincipal()).getUsername();
+        Long memberId = ((Accessor) authentication.getPrincipal()).getId();
         OrderCommand newOrder = OrderCommand.builder()
                 .orderItemCommands(
                         request.getItems().stream()
@@ -45,8 +45,8 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public OrderResponse getOrder(Authentication authentication, @PathVariable("id") String orderId) {
-        String memberId = ((Accessor) authentication.getPrincipal()).getUsername();
+    public OrderResponse getOrder(Authentication authentication, @PathVariable("id") Long orderId) {
+        Long memberId = ((Accessor) authentication.getPrincipal()).getId();
 
         Order order = this.orderService.getOrder(memberId, orderId);
 
@@ -54,8 +54,8 @@ public class OrderController {
     }
 
     @PutMapping("/{id}/cancel")
-    public void cancelOrder(Authentication authentication, @PathVariable("id") String orderId) {
-        String memberId = ((Accessor) authentication.getPrincipal()).getUsername();
+    public void cancelOrder(Authentication authentication, @PathVariable("id") Long orderId) {
+        Long memberId = ((Accessor) authentication.getPrincipal()).getId();
 
         this.orderService.cancelOrder(memberId, orderId);
     }

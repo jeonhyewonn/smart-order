@@ -6,5 +6,5 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class OrderIdResponse {
-    private final String orderId;
+    private final Long orderId;
 }

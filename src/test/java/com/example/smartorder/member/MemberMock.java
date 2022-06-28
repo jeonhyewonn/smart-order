@@ -4,10 +4,10 @@ import com.example.smartorder.member.domain.AgeGroup;
 import com.example.smartorder.member.domain.Gender;
 import com.example.smartorder.member.domain.Member;
 import com.example.smartorder.member.service.dto.JoinMemberCommand;
-import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 
-@NoArgsConstructor
+import static org.springframework.test.util.ReflectionTestUtils.setField;
+
 public class MemberMock {
     public final JoinMemberCommand joinMemberCmd = JoinMemberCommand.builder()
             .accessId("mockAccessId")
@@ -21,4 +21,8 @@ public class MemberMock {
             this.joinMemberCmd,
             PasswordEncoderFactories.createDelegatingPasswordEncoder()
     );
+
+    public MemberMock() {
+        setField(this.member, "id", 1L);
+    }
 }

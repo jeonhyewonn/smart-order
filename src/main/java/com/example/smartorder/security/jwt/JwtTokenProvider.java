@@ -45,7 +45,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
                 .setClaims(claims)
-                .setSubject(member.getId())
+                .setSubject(member.getId().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + this.accessTokenExpiration))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
@@ -58,9 +58,8 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody();
         String roleName = (String) claims.get("role");
-        String id = claims.getSubject();
 
-        UserDetails accessor = new Accessor(roleName, id);
+        UserDetails accessor = new Accessor(roleName, claims.getSubject());
 
         return new UsernamePasswordAuthenticationToken(accessor, "", accessor.getAuthorities());
     }
