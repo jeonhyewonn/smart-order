@@ -30,10 +30,10 @@ public class MemberController {
         JoinMemberCommand joinMember = JoinMemberCommand.builder()
                 .accessId(request.getAccessId())
                 .password(request.getPassword())
-                .name(request.getName())
-                .ageGroup(request.getAgeGroup())
-                .gender(request.getGender())
-                .tel(request.getTel())
+                .name(request.getProfile().getName())
+                .ageGroup(request.getProfile().getAgeGroup())
+                .gender(request.getProfile().getGender())
+                .tel(request.getProfile().getTel())
                 .build();
 
         Member member = this.memberService.join(joinMember);
