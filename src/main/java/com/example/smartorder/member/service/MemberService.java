@@ -8,24 +8,23 @@ import com.example.smartorder.member.repository.MemberRepository;
 import com.example.smartorder.member.service.dto.JoinMemberCommand;
 import com.example.smartorder.member.service.dto.LoginMemberCommand;
 import com.example.smartorder.member.service.dto.UpdateProfileCommand;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
+@RequiredArgsConstructor
 @Service
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder) {
-        this.memberRepository = memberRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
-
     @Transactional
     public Member join(JoinMemberCommand joinMember) {
-        Member existingMember = this.memberRepository.findByAccessId(joinMember.getAccessId());
-        if (existingMember != null) throw new AlreadyExistingMemberException();
+        Optional<Member> existingMember = this.memberRepository.findByAccessId(joinMember.getAccessId());
+        if (existingMember.isPresent()) throw new AlreadyExistingMemberException();
 
         Member newMember = Member.createBy(joinMember, this.passwordEncoder);
         this.memberRepository.save(newMember);
@@ -34,29 +33,27 @@ public class MemberService {
     }
 
     public Member login(LoginMemberCommand loginMember) {
-        Member existingMember = this.memberRepository.findByAccessId(loginMember.getAccessId());
-        if (existingMember == null) throw new NotFoundMemberException();
+        Member existingMember = this.memberRepository.findByAccessId(loginMember.getAccessId())
+                .orElseThrow(NotFoundMemberException::new);;
         if (!existingMember.getPassword().isMatchedWith(loginMember.getPassword(), this.passwordEncoder)) throw new IncorrectPasswordException();
 
         return existingMember;
     }
 
-    public Member getMember(String id) {
-        Member member = this.memberRepository.findById(id);
-        if (member == null) throw new NotFoundMemberException();
-
-        return member;
+    public Member getMember(Long id) {
+        return this.memberRepository.findById(id)
+                .orElseThrow(NotFoundMemberException::new);
     }
 
     @Transactional
-    public void updateProfile(String id, UpdateProfileCommand profile) {
+    public void updateProfile(Long id, UpdateProfileCommand profile) {
         Member member = this.getMember(id);
 
         member.updateProfile(profile);
     }
 
     @Transactional
-    public void changePassword(String id, String oriPassword, String newPassword) {
+    public void changePassword(Long id, String oriPassword, String newPassword) {
         Member member = this.getMember(id);
         if (!member.getPassword().isMatchedWith(oriPassword, this.passwordEncoder)) throw new IncorrectPasswordException();
 
@@ -64,7 +61,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void deactivateAccount(String id) {
+    public void deactivateAccount(Long id) {
         Member member = this.getMember(id);
 
         member.deactivate();

@@ -1,27 +1,17 @@
 package com.example.smartorder.item.repository;
 
 import com.example.smartorder.item.domain.Item;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 
-@RequiredArgsConstructor
-@Repository
-public class ItemRepository {
-    private final EntityManager em;
+public interface ItemRepository extends JpaRepository<Item, Long> {
+    @Override
+    @Query("SELECT i FROM Item i WHERE i.isDeleted = false")
+    public List<Item> findAll();
 
-    public List<Item> findAll() {
-        return this.em.createQuery("SELECT i FROM Item i WHERE i.isDeleted = :isDeleted", Item.class)
-                .setParameter("isDeleted", false)
-                .getResultList();
-    }
-
-    public List<Item> findByIds(List<String> ids) {
-        return this.em.createQuery("SELECT i FROM Item i WHERE i.isDeleted = :isDeleted AND i.id IN :ids", Item.class)
-                .setParameter("isDeleted", false)
-                .setParameter("ids", ids)
-                .getResultList();
-    }
+    @Query("SELECT i FROM Item i WHERE i.isDeleted = false AND i.id IN :ids")
+    public List<Item> findByIds(@Param("ids") List<Long> ids);
 }

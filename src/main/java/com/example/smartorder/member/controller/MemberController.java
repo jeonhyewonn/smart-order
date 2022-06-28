@@ -57,7 +57,7 @@ public class MemberController {
 
     @GetMapping("/members/me/profile")
     public ProfileResponse getProfile(Authentication authentication) {
-        String memberId = ((Accessor) authentication.getPrincipal()).getUsername();
+        Long memberId = ((Accessor) authentication.getPrincipal()).getId();
 
         Member member = this.memberService.getMember(memberId);
 
@@ -66,7 +66,7 @@ public class MemberController {
 
     @PatchMapping("/members/me/profile")
     public void updateProfile(Authentication authentication, @RequestBody @Valid ProfileRequest request) {
-        String memberId = ((Accessor) authentication.getPrincipal()).getUsername();
+        Long memberId = ((Accessor) authentication.getPrincipal()).getId();
         UpdateProfileCommand profile = UpdateProfileCommand.builder()
                 .name(request.getName())
                 .ageGroup(request.getAgeGroup())
@@ -79,14 +79,14 @@ public class MemberController {
 
     @PutMapping("/members/me/password")
     public void changePassword(Authentication authentication, @RequestBody @Valid PasswordRequest request) {
-        String memberId = ((Accessor) authentication.getPrincipal()).getUsername();
+        Long memberId = ((Accessor) authentication.getPrincipal()).getId();
 
         this.memberService.changePassword(memberId, request.getOriPassword(), request.getNewPassword());
     }
 
     @DeleteMapping("/members/me")
     public void deleteAccount(Authentication authentication) {
-        String memberId = ((Accessor) authentication.getPrincipal()).getUsername();
+        Long memberId = ((Accessor) authentication.getPrincipal()).getId();
 
         this.memberService.deactivateAccount(memberId);
     }

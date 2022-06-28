@@ -12,12 +12,12 @@ import java.util.List;
 
 @Entity
 @Table(name = "items")
-@Getter @Setter(AccessLevel.PROTECTED)
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Item {
     @Id
-    @GeneratedValue
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
     private Double price;
     private Boolean isDeleted;

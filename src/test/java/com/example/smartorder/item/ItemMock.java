@@ -1,21 +1,21 @@
 package com.example.smartorder.item;
 
 import com.example.smartorder.item.domain.Item;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@NoArgsConstructor
+import static org.springframework.test.util.ReflectionTestUtils.setField;
+
 public class ItemMock {
     private static class TestItem extends Item {
-        public TestItem(String id, String name, Double price) {
+        public TestItem(Long id, String name, Double price) {
             super();
-            this.setId(id);
-            this.setName(name);
-            this.setPrice(price);
-            this.setIsDeleted(false);
-            this.setCreatedAt(LocalDateTime.now());
+            setField(this, "id", id);
+            setField(this, "name", name);
+            setField(this, "price", price);
+            setField(this, "isDeleted", false);
+            setField(this, "createdAt", LocalDateTime.now());
         }
     }
-    public static final Item item = new TestItem("itemId", "유자차", 5000.0);
+    public static final Item item = new TestItem(1L, "유자차", 5000.0);
 }

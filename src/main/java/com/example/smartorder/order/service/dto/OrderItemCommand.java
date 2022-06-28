@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class OrderItemCommand {
-    private String itemId;
+    private Long itemId;
     private Integer quantity;
 
     public Double getPayAmount(Item item) {
