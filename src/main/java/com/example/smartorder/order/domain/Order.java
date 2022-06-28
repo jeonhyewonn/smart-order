@@ -1,5 +1,6 @@
 package com.example.smartorder.order.domain;
 
+import com.example.smartorder.entity.AuditingEntity;
 import com.example.smartorder.item.domain.Item;
 import com.example.smartorder.member.domain.Member;
 import com.example.smartorder.order.service.dto.OrderCommand;
@@ -9,7 +10,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Table(name = "orders")
 @Getter @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Order {
+public class Order extends AuditingEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -32,7 +32,6 @@ public class Order {
     private Double totalAmount;
     private OrderState state;
     private Boolean isCanceled;
-    private LocalDateTime createdAt;
 
     private void setMember(Member member) {
         this.member = member;
@@ -45,7 +44,6 @@ public class Order {
         order.setTotalAmount(newOrder.getTotalAmount());
         order.setState(OrderState.ACCEPTED);
         order.setIsCanceled(false);
-        order.setCreatedAt(LocalDateTime.now());
 
         HashMap<Long, Item> itemMap = new HashMap<>();
         for(Item item : items) {
