@@ -1,29 +1,15 @@
 package com.example.smartorder.member.repository;
 
 import com.example.smartorder.member.domain.Member;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import javax.persistence.EntityManager;
+import java.util.Optional;
 
-@RequiredArgsConstructor
-@Repository
-public class MemberRepository {
-    private final EntityManager em;
+public interface MemberRepository extends JpaRepository<Member, Long> {
+    @Query("SELECT u FROM Member u WHERE u.accessId = :accessId")
+    public Optional<Member> findByAccessId(@Param("accessId") String accessId);
 
-    public void save(Member member) {
-        this.em.persist(member);
-    }
-
-    public Member findByAccessId(String accessId) {
-        return this.em.createQuery("SELECT u FROM Member u WHERE u.accessId = :accessId", Member.class)
-                .setParameter("accessId", accessId)
-                .getResultStream()
-                .findFirst()
-                .orElse(null);
-    }
-
-    public Member findById(String id) {
-        return this.em.find(Member.class, id);
-    }
+    public Optional<Member> findById(Long id);
 }

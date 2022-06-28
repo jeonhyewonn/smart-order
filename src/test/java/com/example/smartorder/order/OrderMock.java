@@ -5,11 +5,11 @@ import com.example.smartorder.member.MemberMock;
 import com.example.smartorder.order.domain.Order;
 import com.example.smartorder.order.service.dto.OrderCommand;
 import com.example.smartorder.order.service.dto.OrderItemCommand;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@NoArgsConstructor
+import static org.springframework.test.util.ReflectionTestUtils.setField;
+
 public class OrderMock {
     public final OrderCommand orderCmd = OrderCommand.builder()
             .orderItemCommands(List.of(
@@ -21,8 +21,12 @@ public class OrderMock {
             .totalAmount((double) 10000)
             .build();
     public final Order order = Order.createBy(
-            this.orderCmd,
+            orderCmd,
             new MemberMock().member,
             List.of(ItemMock.item)
     );
+
+    public OrderMock() {
+        setField(this.order, "id", 1L);
+    }
 }

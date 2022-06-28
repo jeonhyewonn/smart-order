@@ -12,6 +12,7 @@ import com.example.smartorder.order.exception.NotFoundOrderException;
 import com.example.smartorder.order.repository.OrderRepository;
 import com.example.smartorder.order.service.dto.OrderCommand;
 import com.example.smartorder.order.service.dto.OrderItemCommand;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,24 +20,19 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
+@RequiredArgsConstructor
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
     private final MemberRepository memberRepository;
     private final ItemRepository itemRepository;
 
-    public OrderService(OrderRepository orderRepository, MemberRepository memberRepository, ItemRepository itemRepository) {
-        this.orderRepository = orderRepository;
-        this.memberRepository = memberRepository;
-        this.itemRepository = itemRepository;
-    }
-
     @Transactional
-    public Order putOrder(String memberId, OrderCommand newOrder) {
-        Member member = this.memberRepository.findById(memberId);
-        if (member == null) throw new NotFoundMemberException();
+    public Order putOrder(Long memberId, OrderCommand newOrder) {
+        Member member = this.memberRepository.findById(memberId)
+                .orElseThrow(NotFoundMemberException::new);
 
-        List<String> itemIds = newOrder.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).collect(toList());
+        List<Long> itemIds = newOrder.getOrderItemCommands().stream().map(OrderItemCommand::getItemId).collect(toList());
         List<Item> items = this.itemRepository.findByIds(itemIds);
         if (items.size() != itemIds.size()) throw new NotFoundItemException();
 
@@ -48,19 +44,17 @@ public class OrderService {
         return order;
     }
 
-    public Order getOrder(String memberId, String orderId) {
-        Order order = this.orderRepository.findById(orderId);
-        if (order == null) throw new NotFoundOrderException();
+    public Order getOrder(Long memberId, Long orderId) {
+        Order order = this.orderRepository.findById(orderId)
+                .orElseThrow(NotFoundOrderException::new);
         if (!order.getMember().getId().equals(memberId)) throw new NotFoundMemberException();
 
         return order;
     }
 
     @Transactional
-    public void cancelOrder(String memberId, String orderId) {
-        Order order = this.orderRepository.findById(orderId);
-        if (order == null) throw new NotFoundOrderException();
-        if (!order.getMember().getId().equals(memberId)) throw new NotFoundMemberException();
+    public void cancelOrder(Long memberId, Long orderId) {
+        Order order = this.getOrder(memberId, orderId);
 
         order.cancel();
     }

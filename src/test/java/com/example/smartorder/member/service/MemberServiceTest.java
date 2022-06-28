@@ -17,7 +17,7 @@ import org.mockito.Mockito;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.UUID;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -52,7 +52,7 @@ class MemberServiceTest {
                 .tel("01012345678")
                 .build();
         Member existingMember = Member.createBy(joinMember, this.passwordEncoder);
-        when(this.memberRepository.findByAccessId(joinMember.getAccessId())).thenReturn(existingMember);
+        when(this.memberRepository.findByAccessId(joinMember.getAccessId())).thenReturn(Optional.of(existingMember));
 
         // Then
         assertThatThrownBy(() -> {
@@ -72,7 +72,7 @@ class MemberServiceTest {
                 .gender(Gender.WOMEN)
                 .tel("01012345678")
                 .build();
-        when(this.memberRepository.findByAccessId(joinMember.getAccessId())).thenReturn(null);
+        when(this.memberRepository.findByAccessId(joinMember.getAccessId())).thenReturn(Optional.empty());
 
         // When
         Member member = this.memberService.join(joinMember);
@@ -88,7 +88,7 @@ class MemberServiceTest {
                 .accessId("unknownAccessId")
                 .password("unknownPassword!")
                 .build();
-        when(this.memberRepository.findByAccessId(loginMember.getAccessId())).thenReturn(null);
+        when(this.memberRepository.findByAccessId(loginMember.getAccessId())).thenReturn(Optional.empty());
 
         // Then
         assertThatThrownBy(() -> {
@@ -104,7 +104,7 @@ class MemberServiceTest {
                 .accessId(existingMember.getAccessId())
                 .password("incorrectPassword!")
                 .build();
-        when(this.memberRepository.findByAccessId(loginMember.getAccessId())).thenReturn(existingMember);
+        when(this.memberRepository.findByAccessId(loginMember.getAccessId())).thenReturn(Optional.of(existingMember));
 
         // Then
         assertThatThrownBy(() -> {
@@ -121,7 +121,7 @@ class MemberServiceTest {
                 .accessId(existingMember.getAccessId())
                 .password(existingRawPassword)
                 .build();
-        when(this.memberRepository.findByAccessId(loginMember.getAccessId())).thenReturn(existingMember);
+        when(this.memberRepository.findByAccessId(loginMember.getAccessId())).thenReturn(Optional.of(existingMember));
 
         // When
         Member member = this.memberService.login(loginMember);
@@ -133,8 +133,8 @@ class MemberServiceTest {
     @Test
     public void getMemberWithUnknownMemberThrowNotFoundMemberException() {
         // Given
-        String memberId = UUID.randomUUID().toString();
-        when(this.memberRepository.findById(memberId)).thenReturn(null);
+        Long memberId = 1L;
+        when(this.memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
         // Then
         assertThatThrownBy(() -> {
@@ -146,8 +146,8 @@ class MemberServiceTest {
     public void getMemberWillSucceed() {
         // Given
         Member existingMember = this.memberMock.member;
-        String memberId = existingMember.getId();
-        when(this.memberRepository.findById(memberId)).thenReturn(existingMember);
+        Long memberId = existingMember.getId();
+        when(this.memberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
 
         // When
         Member member = this.memberService.getMember(memberId);
@@ -159,7 +159,7 @@ class MemberServiceTest {
     @Test
     public void updateProfileWithUnknownMemberThrowNotFoundMemberException() {
         // Given
-        String memberId = UUID.randomUUID().toString();
+        Long memberId = 1L;
         UpdateProfileCommand profile = UpdateProfileCommand
                 .builder()
                 .name("newName")
@@ -167,7 +167,7 @@ class MemberServiceTest {
                 .gender(Gender.WOMEN)
                 .tel("010-4321-8765")
                 .build();
-        when(this.memberRepository.findById(memberId)).thenReturn(null);
+        when(this.memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
         // Then
         assertThatThrownBy(() -> {
@@ -179,19 +179,19 @@ class MemberServiceTest {
     public void updateProfileWillSucceed() {
         // Given
         Member existingMember = this.memberMock.member;
-        String memberId = existingMember.getId();
+        Long memberId = existingMember.getId();
         UpdateProfileCommand profile = UpdateProfileCommand
                 .builder()
                 .name("newName")
                 .tel("010-4321-8765")
                 .build();
-        when(this.memberRepository.findById(memberId)).thenReturn(existingMember);
+        when(this.memberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
 
         // When
         this.memberService.updateProfile(memberId, profile);
 
         // Then
-        Member updatedMember = this.memberRepository.findById(memberId);
+        Member updatedMember = this.memberRepository.findById(memberId).get();
         assertThat(updatedMember.getName()).isEqualTo(profile.getName());
         assertThat(updatedMember.getTel()).isEqualTo(profile.getTel());
     }
@@ -199,10 +199,10 @@ class MemberServiceTest {
     @Test
     public void changePasswordWithUnknownMemberThrowNotFoundMemberException() {
         // Given
-        String memberId = UUID.randomUUID().toString();
+        Long memberId = 1L;
         String oriPassword = "oriPassword";
         String newPassword = "newPassword";
-        when(this.memberRepository.findById(memberId)).thenReturn(null);
+        when(this.memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
         // Then
         assertThatThrownBy(() -> {
@@ -214,10 +214,10 @@ class MemberServiceTest {
     public void changePasswordWithIncorrectOldPasswordThrowIncorrectPasswordException() {
         // Given
         Member existingMember = this.memberMock.member;
-        String memberId = existingMember.getId();
+        Long memberId = existingMember.getId();
         String oriPassword = "oriPassword";
         String newPassword = "newPassword";
-        when(this.memberRepository.findById(memberId)).thenReturn(existingMember);
+        when(this.memberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
 
         // Then
         assertThatThrownBy(() -> {
@@ -229,24 +229,24 @@ class MemberServiceTest {
     public void changePasswordWillSucceed() {
         // Given
         Member existingMember = this.memberMock.member;
-        String memberId = existingMember.getId();
+        Long memberId = existingMember.getId();
         String oriPassword = this.memberMock.joinMemberCmd.getPassword();
         String newPassword = "newPassword";
-        when(this.memberRepository.findById(memberId)).thenReturn(existingMember);
+        when(this.memberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
 
         // When
         this.memberService.changePassword(memberId, oriPassword, newPassword);
 
         // Then
-        Member updatedMember = this.memberRepository.findById(memberId);
-        assertThat(updatedMember.getPassword().isMatchedWith(newPassword, this.passwordEncoder)).isEqualTo(true);
+        Member updatedMember = this.memberRepository.findById(memberId).get();
+        assertThat(updatedMember.getPassword().isMatchedWith(newPassword, this.passwordEncoder)).isTrue();
     }
 
     @Test
     public void deactivateAccountWithUnknownMemberThrowNotFoundMemberException() {
         // Given
-        String memberId = UUID.randomUUID().toString();
-        when(this.memberRepository.findById(memberId)).thenReturn(null);
+        Long memberId = 1L;
+        when(this.memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
         // Then
         assertThatThrownBy(() -> {
@@ -258,14 +258,14 @@ class MemberServiceTest {
     public void deactivateAccountWillSucceed() {
         // Given
         Member existingMember = this.memberMock.member;
-        String memberId = existingMember.getId();
-        when(this.memberRepository.findById(memberId)).thenReturn(existingMember);
+        Long memberId = existingMember.getId();
+        when(this.memberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
 
         // When
         this.memberService.deactivateAccount(memberId);
 
         // Then
-        Member deactivatedMember = this.memberRepository.findById(memberId);
-        assertThat(deactivatedMember.getIsDeleted()).isEqualTo(true);
+        Member deactivatedMember = this.memberRepository.findById(memberId).get();
+        assertThat(deactivatedMember.getIsDeleted()).isTrue();
     }
 }

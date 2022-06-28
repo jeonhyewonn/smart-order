@@ -21,7 +21,8 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String accessId;
 
@@ -50,7 +51,6 @@ public class Member {
 
     public static Member createBy(JoinMemberCommand newMember, PasswordEncoder passwordEncoder) {
         Member member = new Member();
-        member.setId(UUID.randomUUID().toString());
         member.setAccessId(newMember.getAccessId());
         member.setPassword(Password.createBy(newMember.getPassword(), passwordEncoder));
         member.setRole(Role.CLIENT);

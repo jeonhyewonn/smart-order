@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class OrderItemResponse {
-    private final String id;
+    private final Long id;
     private final Integer quantity;
 
     public OrderItemResponse(OrderItem orderItem) {

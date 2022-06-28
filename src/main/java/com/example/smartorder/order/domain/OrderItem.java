@@ -15,8 +15,8 @@ import java.util.UUID;
 @Getter @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem {
-    @Id
-    private String id;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
@@ -32,7 +32,6 @@ public class OrderItem {
 
     public static OrderItem createBy(OrderItemCommand newOrderItem, Order order, Item item) {
         OrderItem orderItem = new OrderItem();
-        orderItem.setId(UUID.randomUUID().toString());
         orderItem.setOrder(order);
         orderItem.setItem(item);
         orderItem.setQuantity(newOrderItem.getQuantity());
