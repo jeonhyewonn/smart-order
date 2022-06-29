@@ -9,6 +9,7 @@ import com.example.smartorder.member.domain.Member;
 import com.example.smartorder.member.exception.NotFoundMemberException;
 import com.example.smartorder.member.repository.MemberRepository;
 import com.example.smartorder.order.OrderMock;
+import com.example.smartorder.order.adapter.publisher.OrderPublisher;
 import com.example.smartorder.order.domain.Order;
 import com.example.smartorder.order.domain.OrderItem;
 import com.example.smartorder.order.exception.IncorrectTotalAmountException;
@@ -39,7 +40,14 @@ class OrderServiceTest {
         this.orderRepository = Mockito.mock(OrderRepository.class);
         this.memberRepository = Mockito.mock(MemberRepository.class);
         this.itemRepository = Mockito.mock(ItemRepository.class);
-        this.orderService = new OrderService(this.orderRepository, this.memberRepository, this.itemRepository);
+        OrderPublisher orderPublisher = Mockito.mock(OrderPublisher.class);
+
+        this.orderService = new OrderService(
+                this.orderRepository,
+                this.memberRepository,
+                this.itemRepository,
+                orderPublisher
+        );
     }
 
     @Test

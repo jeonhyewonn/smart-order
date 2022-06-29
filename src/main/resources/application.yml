@@ -14,12 +14,15 @@ spring:
       ddl-auto: create
     properties:
       hibernate:
-        show_sql: false
-        format_sql: false
+        format_sql: true
     defer-datasource-initialization: true
 
   jackson:
     default-property-inclusion: NON_EMPTY
+
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
 
 logging:
   level:
@@ -30,3 +33,7 @@ jwt:
   secret: testJwtSecret
   expiration:
     access: 3600000
+
+message-broker:
+  topic:
+    order: "order"
