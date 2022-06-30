@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "item_ingredients")
@@ -26,5 +25,4 @@ public class ItemIngredient extends AuditingEntity {
     private Ingredient ingredient;
 
     private Boolean isDeleted;
-    private LocalDateTime createdAt;
 }

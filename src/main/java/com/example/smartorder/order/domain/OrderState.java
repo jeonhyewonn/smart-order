@@ -2,8 +2,7 @@ package com.example.smartorder.order.domain;
 
 public enum OrderState {
     ACCEPTED,
-    COOKING,
+    COOKED,
     RELEASED,
-    DELIVERED,
     CANCELED
 }

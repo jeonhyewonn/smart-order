@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -21,11 +20,21 @@ public class Item extends AuditingEntity {
     private String name;
     private Double price;
     private Boolean isDeleted;
-    private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "item")
     private List<ItemIngredient> itemIngredients;
 
     @OneToMany(mappedBy = "item")
     private List<OrderItem> orderItems;
+
+    public Boolean hasSufficientIngredients(int quantity) {
+        return this.getItemIngredients().stream()
+                .allMatch(map -> map.getIngredient().hasStock(quantity));
+    }
+
+    public void deductIngredients(int quantity) {
+        for (ItemIngredient itemIngredient : this.itemIngredients) {
+            itemIngredient.getIngredient().deductStock(quantity);
+        }
+    }
 }

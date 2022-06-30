@@ -10,8 +10,8 @@ spring:
 
   jpa:
     hibernate:
-#      ddl-auto: validate
-      ddl-auto: create
+      ddl-auto: validate
+#      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
@@ -23,6 +23,9 @@ spring:
   kafka:
     producer:
       bootstrap-servers: localhost:9092
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: test-group
 
 logging:
   level:
@@ -36,4 +39,6 @@ jwt:
 
 message-broker:
   topic:
-    order: "order"
+    order: order
+    failed-order: failed-order
+    dish: dish
