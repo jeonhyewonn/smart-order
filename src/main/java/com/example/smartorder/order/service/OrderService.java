@@ -6,7 +6,7 @@ import com.example.smartorder.item.repository.ItemRepository;
 import com.example.smartorder.member.domain.Member;
 import com.example.smartorder.member.exception.NotFoundMemberException;
 import com.example.smartorder.member.repository.MemberRepository;
-import com.example.smartorder.order.adapter.publisher.OrderPublisher;
+import com.example.smartorder.order.adapter.publisher.CounterPublisher;
 import com.example.smartorder.order.domain.Order;
 import com.example.smartorder.order.exception.IncorrectTotalAmountException;
 import com.example.smartorder.order.exception.NotFoundOrderException;
@@ -27,7 +27,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final MemberRepository memberRepository;
     private final ItemRepository itemRepository;
-    private final OrderPublisher orderPublisher;
+    private final CounterPublisher counterPublisher;
 
     @Transactional
     public Order putOrder(Long memberId, OrderCommand newOrder) {
@@ -43,7 +43,7 @@ public class OrderService {
         Order order = Order.createBy(newOrder, member, items);
         this.orderRepository.save(order);
 
-        this.orderPublisher.createOrder(order);
+        this.counterPublisher.createOrder(order);
 
         return order;
     }

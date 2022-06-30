@@ -64,11 +64,16 @@ public class Order extends AuditingEntity {
         this.setState(OrderState.CANCELED);
     }
 
-    public void toCookedState() {
-        this.setState(OrderState.COOKED);
+    public void reject() {
+        this.setIsCanceled(true);
+        this.setState(OrderState.REJECTED);
     }
 
-    public void toReleasedState() {
+    public void deliver() {
         this.setState(OrderState.RELEASED);
+    }
+
+    public void complete() {
+        this.setState(OrderState.COMPLETED);
     }
 }
