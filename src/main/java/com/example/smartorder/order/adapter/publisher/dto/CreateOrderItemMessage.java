@@ -3,12 +3,14 @@ package com.example.smartorder.order.adapter.publisher.dto;
 import com.example.smartorder.adapter.broker.PublisherMessage;
 import com.example.smartorder.order.domain.OrderItem;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class CreateOrderItemMessage implements PublisherMessage {
-    private final Long id;
-    private final Long itemId;
-    private final Integer quantity;
+    private Long id;
+    private Long itemId;
+    private Integer quantity;
 
     public CreateOrderItemMessage(OrderItem orderItem) {
         this.id = orderItem.getId();
