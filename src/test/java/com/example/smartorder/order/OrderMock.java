@@ -31,7 +31,7 @@ public class OrderMock {
             List.of(item)
     );
 
-    public final CreateOrderMessage orderMessage = new CreateOrderMessage(this.order);
+    public final CreateOrderMessage createOrderMessage = new CreateOrderMessage(this.order);
 
     public OrderMock() {
         setField(this.order, "id", 1L);

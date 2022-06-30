@@ -9,7 +9,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class ItemService {
+public class ItemQueryService {
     private final ItemRepository itemRepository;
 
     public List<Item> getAllItems() {

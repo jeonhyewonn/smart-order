@@ -1,7 +1,7 @@
 package com.example.smartorder.order.adapter.publisher.dto;
 
 
-import com.example.smartorder.adapter.broker.PublisherMessage;
+import com.example.smartorder.adapter.broker.message.PublisherMessage;
 import com.example.smartorder.order.domain.Order;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
