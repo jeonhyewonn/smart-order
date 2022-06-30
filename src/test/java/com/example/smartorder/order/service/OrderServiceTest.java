@@ -9,7 +9,7 @@ import com.example.smartorder.member.domain.Member;
 import com.example.smartorder.member.exception.NotFoundMemberException;
 import com.example.smartorder.member.repository.MemberRepository;
 import com.example.smartorder.order.OrderMock;
-import com.example.smartorder.order.adapter.publisher.OrderPublisher;
+import com.example.smartorder.order.adapter.publisher.CounterPublisher;
 import com.example.smartorder.order.domain.Order;
 import com.example.smartorder.order.domain.OrderItem;
 import com.example.smartorder.order.exception.IncorrectTotalAmountException;
@@ -35,18 +35,19 @@ class OrderServiceTest {
     private final ItemRepository itemRepository;
     private final OrderService orderService;
     private final Member member = new MemberMock().member;
+    private final Item item = new ItemMock().item;
 
     public OrderServiceTest() {
         this.orderRepository = Mockito.mock(OrderRepository.class);
         this.memberRepository = Mockito.mock(MemberRepository.class);
         this.itemRepository = Mockito.mock(ItemRepository.class);
-        OrderPublisher orderPublisher = Mockito.mock(OrderPublisher.class);
+        CounterPublisher counterPublisher = Mockito.mock(CounterPublisher.class);
 
         this.orderService = new OrderService(
                 this.orderRepository,
                 this.memberRepository,
                 this.itemRepository,
-                orderPublisher
+                counterPublisher
         );
     }
 
@@ -55,7 +56,7 @@ class OrderServiceTest {
         // Given
         Long memberId = 0L;
         OrderItemCommand orderItem = OrderItemCommand.builder()
-                .itemId(ItemMock.item.getId())
+                .itemId(item.getId())
                 .quantity(2)
                 .build();
         OrderCommand order = OrderCommand.builder()
@@ -98,7 +99,6 @@ class OrderServiceTest {
     public void putOrderWithWrongTotalAmountThrowIncorrectTotalAmountException() {
         // Given
         Long memberId = this.member.getId();
-        Item item = ItemMock.item;
         OrderItemCommand orderItem = OrderItemCommand.builder()
                 .itemId(item.getId())
                 .quantity(2)
@@ -123,7 +123,6 @@ class OrderServiceTest {
     public void putOrderWillSucceed() {
         // Given
         Long memberId = this.member.getId();
-        Item item = ItemMock.item;
         OrderItemCommand orderItem = OrderItemCommand.builder()
                 .itemId(item.getId())
                 .quantity(2)

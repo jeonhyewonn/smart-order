@@ -45,3 +45,4 @@ message-broker:
     delivery: delivery
     delivery-success: delivery-success
     delivery-fail: delivery-fail
+    rejection: rejection
