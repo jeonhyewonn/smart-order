@@ -1,5 +1,6 @@
 package com.example.smartorder.adapter.broker;
 
+import com.example.smartorder.adapter.broker.message.PublisherMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;

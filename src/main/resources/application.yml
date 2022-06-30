@@ -39,6 +39,9 @@ jwt:
 
 message-broker:
   topic:
-    order: order
-    failed-order: failed-order
-    dish: dish
+    cooking: cooking
+    cooking-success: cooking-success
+    cooking-fail: cooking-fail
+    delivery: delivery
+    delivery-success: delivery-success
+    delivery-fail: delivery-fail
