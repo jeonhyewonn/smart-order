@@ -61,5 +61,14 @@ public class Order extends AuditingEntity {
 
     public void cancel() {
         this.setIsCanceled(true);
+        this.setState(OrderState.CANCELED);
+    }
+
+    public void toCookedState() {
+        this.setState(OrderState.COOKED);
+    }
+
+    public void toReleasedState() {
+        this.setState(OrderState.RELEASED);
     }
 }
