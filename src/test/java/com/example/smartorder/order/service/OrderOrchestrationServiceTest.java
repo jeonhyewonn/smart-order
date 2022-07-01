@@ -1,7 +1,7 @@
 package com.example.smartorder.order.service;
 
-import com.example.smartorder.member.MemberMock;
-import com.example.smartorder.member.domain.Member;
+import com.example.smartorder.item.exception.InsufficientIngredientException;
+import com.example.smartorder.item.exception.NotFoundItemException;
 import com.example.smartorder.order.OrderMock;
 import com.example.smartorder.order.adapter.publisher.CounterPublisher;
 import com.example.smartorder.order.adapter.publisher.dto.CreateOrderMessage;
@@ -23,7 +23,6 @@ import static org.springframework.test.util.ReflectionTestUtils.setField;
 class OrderOrchestrationServiceTest {
     private final OrderRepository orderRepository;
     private final OrderOrchestrationService orderOrchestrationService;
-    private final Member member = new MemberMock().member;
     private OrderMock orderMock;
 
     public OrderOrchestrationServiceTest() {
@@ -66,8 +65,30 @@ class OrderOrchestrationServiceTest {
         assertThat(releasedOrder.getState()).isEqualTo(OrderState.RELEASED);
     }
 
-    private String getRejectionCause() {
-        return "InsufficientIngredients";
+    @Test
+    void completeOrderThrowNotFoundOrderException() {
+        // Given
+        Long orderId = 0L;
+        when(this.orderRepository.findById(orderId)).thenReturn(Optional.empty());
+
+        // Then
+        assertThatThrownBy(() -> {
+            this.orderOrchestrationService.completeOrder(orderId);
+        }).isInstanceOf(NotFoundOrderException.class);
+    }
+
+    @Test
+    void completeOrderWillSucceed() {
+        // Given
+        Long orderId = this.orderMock.order.getId();
+        when(this.orderRepository.findById(orderId)).thenReturn(Optional.of(this.orderMock.order));
+
+        // When
+        this.orderOrchestrationService.completeOrder(orderId);
+
+        // Then
+        Order releasedOrder = this.orderRepository.findById(orderId).get();
+        assertThat(releasedOrder.getState()).isEqualTo(OrderState.COMPLETED);
     }
 
     @Test
@@ -80,7 +101,7 @@ class OrderOrchestrationServiceTest {
 
         // Then
         assertThatThrownBy(() -> {
-            this.orderOrchestrationService.rejectOrder(orderMessage, getRejectionCause());
+            this.orderOrchestrationService.rejectOrder(orderId, InsufficientIngredientException.class.getSimpleName());
         }).isInstanceOf(NotFoundOrderException.class);
     }
 
@@ -92,7 +113,7 @@ class OrderOrchestrationServiceTest {
         when(this.orderRepository.findById(orderId)).thenReturn(Optional.of(this.orderMock.order));
 
         // When
-        this.orderOrchestrationService.rejectOrder(orderMessage, getRejectionCause());
+        this.orderOrchestrationService.rejectOrder(orderId, NotFoundItemException.class.getSimpleName());
 
         // Then
         Order rejectedOrder = this.orderRepository.findById(orderId).get();
