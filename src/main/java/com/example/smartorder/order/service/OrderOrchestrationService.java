@@ -1,7 +1,6 @@
 package com.example.smartorder.order.service;
 
 import com.example.smartorder.order.adapter.publisher.CounterPublisher;
-import com.example.smartorder.order.adapter.publisher.dto.CreateOrderMessage;
 import com.example.smartorder.order.domain.Order;
 import com.example.smartorder.order.exception.NotFoundOrderException;
 import com.example.smartorder.order.repository.OrderRepository;
@@ -28,8 +27,16 @@ public class OrderOrchestrationService {
     }
 
     @Transactional
-    public void rejectOrder(CreateOrderMessage orderMessage, String cause) {
-        Order order = this.orderRepository.findById(orderMessage.getId())
+    public void completeOrder(Long id) {
+        Order order = this.orderRepository.findById(id)
+                .orElseThrow(NotFoundOrderException::new);
+
+        order.complete();
+    }
+
+    @Transactional
+    public void rejectOrder(Long id, String cause) {
+        Order order = this.orderRepository.findById(id)
                 .orElseThrow(NotFoundOrderException::new);
 
         order.reject();
