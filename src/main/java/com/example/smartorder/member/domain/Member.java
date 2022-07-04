@@ -43,7 +43,7 @@ public class Member extends AuditingEntity {
 
     private Boolean isDeleted;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
 
     public static Member createBy(JoinMemberCommand newMember, PasswordEncoder passwordEncoder) {

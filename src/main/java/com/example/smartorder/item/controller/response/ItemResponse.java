@@ -4,7 +4,7 @@ import com.example.smartorder.item.domain.Item;
 import lombok.Getter;
 
 @Getter
-public class ItemResponse {
+public class ItemResponse implements Response {
     private final Long id;
     private final String name;
     private final Double price;
