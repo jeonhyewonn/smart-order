@@ -21,7 +21,7 @@ public class Ingredient extends AuditingEntity {
     private Integer stock;
     private Boolean isDeleted;
 
-    @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemIngredient> itemIngredients;
 
     public boolean hasStock(int cnt) {
