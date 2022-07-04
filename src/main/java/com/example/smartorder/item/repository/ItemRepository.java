@@ -7,8 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ItemRepository extends JpaRepository<Item, Long> {
-    @Override
+public interface ItemRepository extends JpaRepository<Item, Long>, ItemCustomRepository {
     @Query("SELECT i FROM Item i WHERE i.isDeleted = false")
     public List<Item> findAll();
 
