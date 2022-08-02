@@ -8,6 +8,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    @Query("SELECT distinct o FROM Order o JOIN FETCH o.member m WHERE o.id = :id")
+    @Query("SELECT o FROM Order o JOIN o.member m WHERE o.id = :id")
     public Optional<Order> findById(@Param("id") Long id);
 }
