@@ -11,6 +11,13 @@ public interface ItemRepository extends JpaRepository<Item, Long>, ItemCustomRep
     @Query("SELECT i FROM Item i WHERE i.isDeleted = false")
     public List<Item> findAll();
 
-    @Query("SELECT i FROM Item i WHERE i.isDeleted = false AND i.id IN :ids")
+    @Query(
+            "SELECT distinct i " +
+            "FROM Item i " +
+            "LEFT JOIN FETCH i.itemIngredients map " +
+            "JOIN FETCH map.ingredient igd " +
+            "WHERE i.isDeleted = false AND i.id IN :ids " +
+            "AND map.isDeleted = false AND igd.isDeleted = false"
+    )
     public List<Item> findByIds(@Param("ids") List<Long> ids);
 }
