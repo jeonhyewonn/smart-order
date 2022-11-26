@@ -17,5 +17,6 @@ FROM eclipse-temurin:11-alpine
 WORKDIR /workspace/app
 
 COPY --from=builder /workspace/builder/build/libs/*.jar app.jar
+COPY docker-entrypoint.sh .
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "docker-entrypoint.sh"]

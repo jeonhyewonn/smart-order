@@ -39,3 +39,13 @@
 ```
     $ kafka-console-consumer.sh --bootstrap-server localhost:9092 --from-beginning --topic test
 ```
+
+## 빌드 (w/ docker)
+```
+    $ docker build -t app . (--platform linux/amd64)
+```
+
+## 실행(w/ docker)
+```
+    $ docker run -p 8080:3000 -e PROFILE=local -e JASYPT_PASSWORD=testJasyptEncryptor app
+```
